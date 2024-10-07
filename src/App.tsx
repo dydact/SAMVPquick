@@ -11,6 +11,7 @@ import Layout from "./app/layout"; // Import the Layout component
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
+import Scheduling from './pages/Scheduling';
 
 Amplify.configure(outputs);
 
@@ -89,6 +90,16 @@ function App() {
             path="/analytics" 
             element={
               <Analytics 
+                isSignedIn={isSignedIn} 
+                handleSignOut={handleSignOut} 
+                setShowAuthPopup={setShowAuthPopup}
+              />
+            } 
+          />
+          <Route 
+            path="/scheduling" 
+            element={
+              <Scheduling 
                 isSignedIn={isSignedIn} 
                 handleSignOut={handleSignOut} 
                 setShowAuthPopup={setShowAuthPopup}
