@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-amplify/api": "^6.0.53",
     "@aws-amplify/react-native": "^1.1.6",
     "@aws-amplify/ui-react": "^6.2.0",
     "@aws-amplify/ui-react-native": "^2.2.13",
