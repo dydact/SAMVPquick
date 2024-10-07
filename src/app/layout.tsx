@@ -3,12 +3,11 @@
 
 import React, { useState } from 'react';
 import { Button } from "../components/ui/button"
-import { Card, CardContent } from "../components/ui/card"
-import { Input } from "../components/ui/input"
 import { Tabs, TabsList, TabsTrigger } from "../components/ui/tabs"
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
-import { ArrowLeft, MessageSquare, LogOut, User, Settings, Clock, Edit, X } from 'lucide-react'
+import { ArrowLeft, MessageSquare } from 'lucide-react'
 import '../styles/layout.css';
+import Chat from '../components/Chat';
+import UserMenu from '../components/UserMenu';
 
 const navItems = ['Dashboard', 'Clients', 'Billing', 'Time Tracking', 'Payroll', 'Analytics', 'Chat', 'Scheduling'];
 
@@ -27,23 +26,6 @@ interface LayoutProps {
   handleSignOut: () => void;
   setShowAuthPopup: (show: boolean) => void; 
 }
-
-const Avatar: React.FC<{ name: string; size?: number }> = ({ name, size = 40 }) => {
-  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase();
-
-  return (
-    <div
-      className="avatar"
-      style={{
-        width: size,
-        height: size,
-        fontSize: size / 2,
-      }}
-    >
-      {initials}
-    </div>
-  );
-};
 
 const Layout: React.FC<LayoutProps> = ({ children, showBackButton = false, isSignedIn, handleSignOut, setShowAuthPopup }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -75,53 +57,14 @@ const Layout: React.FC<LayoutProps> = ({ children, showBackButton = false, isSig
                 {item}
               </a>
             ))}
-            {isSignedIn ? ( 
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon" className="avatar-button">
-                    <Avatar name={user.name} size={32} />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="popover">
-                  <div className="popover-content">
-                    <div className="user-info">
-                      <Avatar name={user.name} size={60} />
-                      <div>
-                        <h3 className="user-name">{user.name}</h3>
-                        <p className="user-email">{user.email}</p>
-                      </div>
-                    </div>
-                    <div className="popover-buttons">
-                      <Button variant="ghost" className="popover-button">
-                        <User className="icon" />
-                        View Profile
-                      </Button>
-                      <Button variant="ghost" className="popover-button">
-                        <Clock className="icon" />
-                        View Timesheets
-                      </Button>
-                      <Button variant="ghost" className="popover-button">
-                        <Edit className="icon" />
-                        Modify Entered Times
-                      </Button>
-                      <Button variant="ghost" className="popover-button">
-                        <Settings className="icon" />
-                        User Settings
-                      </Button>
-                      <Button variant="ghost" className="popover-button logout" onClick={handleSignOut}> 
-                        <LogOut className="icon" />
-                        Log Out
-                      </Button>
-                    </div>
-                  </div>
-                </PopoverContent>
-              </Popover>
-            ) : (
-              <Button onClick={() => setShowAuthPopup(true)} className="sign-in-button">Sign In</Button> 
-            )}
             <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)} className="chat-button">
               <MessageSquare className="icon" />
             </Button>
+            {isSignedIn ? ( 
+              <UserMenu user={user} handleSignOut={handleSignOut} />
+            ) : (
+              <Button onClick={() => setShowAuthPopup(true)} className="sign-in-button">Sign In</Button> 
+            )}
           </nav>
         </div>
       </header>
@@ -146,26 +89,7 @@ const Layout: React.FC<LayoutProps> = ({ children, showBackButton = false, isSig
         {children}
       </main>
 
-      {isChatOpen && (
-        <Card className="chat-card">
-          <CardContent className="chat-content">
-            <div className="chat-header">
-              <h3 className="chat-title">Worker Chat</h3>
-              <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(false)} className="chat-close">
-                <X className="icon" />
-              </Button>
-            </div>
-            <div className="chat-messages">
-              {/* Chat messages would go here */}
-            </div>
-            <Input
-              type="text"
-              placeholder="Type a message..."
-              className="chat-input"
-            />
-          </CardContent>
-        </Card>
-      )}
+      <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
     </div>
   );
 };
