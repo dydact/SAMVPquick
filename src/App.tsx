@@ -1,25 +1,19 @@
-import { FormEvent, useState, useEffect } from "react";
+// app.tsx
+import { useState, useEffect } from "react";
 import { Amplify } from "aws-amplify";
-import { signUp, signIn, signOut, getCurrentUser } from "aws-amplify/auth";
+import { signOut, getCurrentUser } from "aws-amplify/auth";
 import outputs from "../amplify_outputs.json";
 import TodoList from "./components/TodoList";
+import AuthPopup from "./components/AuthPopup";
 import "./Layout.css";
+import Layout from "./app/layout"; // Import the Layout component
 
 Amplify.configure(outputs);
 
-interface FormElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
-  password: HTMLInputElement;
-}
-
-interface CustomForm extends HTMLFormElement {
-  readonly elements: FormElements;
-}
-
 function App() {
-  const [authState, setAuthState] = useState<'signIn' | 'signUp'>('signIn');
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAuthPopup, setShowAuthPopup] = useState(false);
 
   useEffect(() => {
     checkAuthState();
@@ -36,47 +30,6 @@ function App() {
     }
   }
 
-  async function handleSignUp(event: FormEvent<CustomForm>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    try {
-      const { isSignUpComplete, userId } = await signUp({
-        username: form.elements.email.value,
-        password: form.elements.password.value,
-        options: {
-          userAttributes: {
-            email: form.elements.email.value,
-          },
-          autoSignIn: true
-        }
-      });
-      
-      console.log("Sign-up result:", { isSignUpComplete, userId });
-      if (isSignUpComplete) {
-        setIsSignedIn(true);
-      }
-    } catch (error) {
-      console.error("Error during sign-up:", error);
-      // Handle sign-up error
-    }
-  }
-
-  async function handleSignIn(event: FormEvent<CustomForm>) {
-    event.preventDefault();
-    const form = event.currentTarget;
-    try {
-      const signInResult = await signIn({
-        username: form.elements.email.value,
-        password: form.elements.password.value,
-      });
-      console.log("Sign-in result:", signInResult);
-      setIsSignedIn(true);
-    } catch (error) {
-      console.error("Error during sign-in:", error);
-      // Handle sign-in error
-    }
-  }
-
   async function handleSignOut() {
     try {
       await signOut();
@@ -86,55 +39,42 @@ function App() {
     }
   }
 
+  function handleAuthSuccess() {
+    setIsSignedIn(true);
+    setShowAuthPopup(false);
+  }
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
 
   return (
-    <div className="app-container">
-      <header className="header">
-        <h1>My App</h1>
-        {isSignedIn && <button onClick={handleSignOut}>Sign Out</button>}
-      </header>
-
-      {!isSignedIn ? (
-        <section className="auth-section">
-          {authState === 'signIn' && (
-            <form onSubmit={handleSignIn} className="auth-form">
-              <h2>Sign In</h2>
-              <input type="email" name="email" placeholder="Email" required />
-              <input type="password" name="password" placeholder="Password" required />
-              <button type="submit">Sign In</button>
-              <p>Don't have an account? <button type="button" onClick={() => setAuthState('signUp')}>Sign Up</button></p>
-            </form>
-          )}
-
-          {authState === 'signUp' && (
-            <form onSubmit={handleSignUp} className="auth-form">
-              <h2>Sign Up</h2>
-              <input type="email" name="email" placeholder="Email" required />
-              <input type="password" name="password" placeholder="Password" required />
-              <button type="submit">Sign Up</button>
-              <p>Already have an account? <button type="button" onClick={() => setAuthState('signIn')}>Sign In</button></p>
-            </form>
-          )}
-        </section>
-      ) : (
-        <section className="todo-section">
-          <TodoList />
-        </section>
+    <Layout 
+      isSignedIn={isSignedIn} 
+      handleSignOut={handleSignOut} 
+      setShowAuthPopup={setShowAuthPopup} 
+    > 
+      <div className="app-container"> 
+        {/* ... your existing app content ... */}
+        {isSignedIn ? (
+          <section className="todo-section">
+            <TodoList />
+          </section>
+        ) : (
+          <div className="welcome-message">
+            <h2>Welcome to My App</h2>
+            <p>Please sign in to view and manage your todos.</p>
+          </div>
+        )}
+        {/* ... your existing app content ... */}
+      </div>
+      {showAuthPopup && (
+        <AuthPopup
+          onClose={() => setShowAuthPopup(false)}
+          onAuthSuccess={handleAuthSuccess}
+        />
       )}
-
-      <footer className="footer">
-        <div>
-          🥳 App successfully hosted. Try creating a new todo.
-          <br />
-          <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-            Review next step of this tutorial.
-          </a>
-        </div>
-      </footer>
-    </div>
+    </Layout>
   );
 }
 
