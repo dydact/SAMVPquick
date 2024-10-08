@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Button } from '../components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useNavigate } from 'react-router-dom';
+import Footer from '../components/Footer';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -119,13 +120,15 @@ const SignUpPage: React.FC = () => {
       icon: '📊', 
       title: 'Advanced Analytics', 
       description: 'Gain deep insights into your site performance with real-time data visualization, custom reports, and predictive analytics.',
-      details: 'Our advanced analytics suite provides comprehensive insights into user behavior, conversion rates, and site performance. Customize dashboards, set up automated reports, and leverage machine learning for predictive analysis.'
+      details: 'Our advanced analytics suite provides comprehensive insights into user behavior, conversion rates, and site performance. Customize dashboards, set up automated reports, and leverage machine learning for predictive analysis.',
+      path: '/features/advanced-analytics'
     },
     { 
       icon: '🔔', 
       title: 'Real-time Alerts', 
       description: 'Stay informed with instant notifications for critical events, security threats, and performance issues.',
-      details: 'Set up customizable alerts for various triggers including traffic spikes, security breaches, server downtime, and more. Receive notifications via email, SMS, or push notifications to your mobile device.'
+      details: 'Set up customizable alerts for various triggers including traffic spikes, security breaches, server downtime, and more. Receive notifications via email, SMS, or push notifications to your mobile device.',
+      path: '/features/real-time-alerts'
     },
     { icon: '🔒', title: 'Enhanced Security', description: 'Protect your site with cutting-edge security measures' },
     { icon: '🚀', title: 'Performance Optimization', description: 'Boost your site speed and efficiency' },
@@ -148,7 +151,8 @@ const SignUpPage: React.FC = () => {
         'Up to 50 users'
       ],
       details: 'Perfect for small to medium-sized businesses looking to enhance their site management capabilities.',
-      path: '/plans/essentials'
+      path: '/plans/essentials',
+      discount: 'First 3 months free'
     },
     { 
       title: 'SiteAware Pro', 
@@ -163,7 +167,8 @@ const SignUpPage: React.FC = () => {
         'Up to 100 users'
       ],
       details: 'Ideal for growing businesses that need advanced features and increased capacity.',
-      path: '/plans/pro'
+      path: '/plans/pro',
+      discount: '10% off first year'
     },
     { 
       title: 'SiteAware Enterprise', 
@@ -177,7 +182,8 @@ const SignUpPage: React.FC = () => {
         'Up to 200 users'
       ],
       details: 'Designed for large enterprises requiring customized solutions and high-level support.',
-      path: '/plans/enterprise'
+      path: '/plans/enterprise',
+      discount: '5% off first year'
     },
     { 
       title: 'SiteAware Custom', 
@@ -191,63 +197,68 @@ const SignUpPage: React.FC = () => {
         'Up to 250 users'
       ],
       details: 'Tailored solutions for organizations with specific requirements and the need for complete customization.',
-      path: '/plans/custom'
+      path: '/plans/custom',
+      discount: 'Custom pricing available'
     },
   ];
 
   return (
-    <PageContainer>
-      <Hero>
-        <Title>Elevate Your Enterprise with SiteAware</Title>
-        <Subtitle>Comprehensive monitoring, powerful analytics, and unmatched security for your business</Subtitle>
-      </Hero>
+    <>
+      <PageContainer>
+        <Hero>
+          <Title>Elevate Your Enterprise with SiteAware</Title>
+          <Subtitle>Comprehensive monitoring, powerful analytics, and unmatched security for your business</Subtitle>
+        </Hero>
 
-      <FeaturesGrid>
-        {features.map((feature, index) => (
-          <Popover key={index}>
-            <PopoverTrigger asChild>
-              <FeatureBox>
-                <FeatureIcon>{feature.icon}</FeatureIcon>
-                <FeatureTitle>{feature.title}</FeatureTitle>
-                <FeatureDescription>{feature.description}</FeatureDescription>
-              </FeatureBox>
-            </PopoverTrigger>
-            <PopoverContent>
-              <p>{feature.details}</p>
-            </PopoverContent>
-          </Popover>
-        ))}
-      </FeaturesGrid>
+        <FeaturesGrid>
+          {features.map((feature, index) => (
+            <Popover key={index}>
+              <PopoverTrigger asChild>
+                <FeatureBox onClick={() => navigate(feature.path)}>
+                  <FeatureIcon>{feature.icon}</FeatureIcon>
+                  <FeatureTitle>{feature.title}</FeatureTitle>
+                  <FeatureDescription>{feature.description}</FeatureDescription>
+                </FeatureBox>
+              </PopoverTrigger>
+              <PopoverContent>
+                <p>{feature.details}</p>
+              </PopoverContent>
+            </Popover>
+          ))}
+        </FeaturesGrid>
 
-      <PlansContainer>
-        {plans.map((plan, index) => (
-          <Popover key={index}>
-            <PopoverTrigger asChild>
-              <PlanCard 
-                featured={plan.title === 'SiteAware Pro'}
-                onClick={() => navigate(plan.path)}
-              >
-                <PlanTitle>{plan.title}</PlanTitle>
-                <PlanPrice>{plan.price}</PlanPrice>
-                <PlanFeatures>
-                  {plan.features.map((feature, featureIndex) => (
-                    <PlanFeature key={featureIndex} featured={plan.title === 'SiteAware Pro'}>{feature}</PlanFeature>
-                  ))}
-                </PlanFeatures>
-                <Button 
-                  variant={plan.title === 'SiteAware Pro' ? 'default' : 'outline'}
+        <PlansContainer>
+          {plans.map((plan, index) => (
+            <Popover key={index}>
+              <PopoverTrigger asChild>
+                <PlanCard 
+                  featured={plan.title === 'SiteAware Pro'}
+                  onClick={() => navigate(plan.path)}
                 >
-                  {plan.title === 'SiteAware Custom' ? 'Contact Us' : `Choose ${plan.title}`}
-                </Button>
-              </PlanCard>
-            </PopoverTrigger>
-            <PopoverContent>
-              <p>{plan.details}</p>
-            </PopoverContent>
-          </Popover>
-        ))}
-      </PlansContainer>
-    </PageContainer>
+                  <PlanTitle>{plan.title}</PlanTitle>
+                  <PlanPrice>{plan.price}</PlanPrice>
+                  <PlanFeatures>
+                    {plan.features.map((feature, featureIndex) => (
+                      <PlanFeature key={featureIndex} featured={plan.title === 'SiteAware Pro'}>{feature}</PlanFeature>
+                    ))}
+                  </PlanFeatures>
+                  <Button 
+                    variant={plan.title === 'SiteAware Pro' ? 'default' : 'outline'}
+                  >
+                    {plan.title === 'SiteAware Custom' ? 'Contact Us' : `Choose ${plan.title}`}
+                  </Button>
+                  <p>{plan.discount}</p>
+                </PlanCard>
+              </PopoverTrigger>
+              <PopoverContent>
+                <p>{plan.details}</p>
+              </PopoverContent>
+            </Popover>
+          ))}
+        </PlansContainer>
+      </PageContainer>
+      <Footer />
+    </>
   );
 };
 

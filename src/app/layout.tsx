@@ -7,9 +7,10 @@ import { MessageSquare, LogOut, User, Settings } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
 import { AuthUser } from 'aws-amplify/auth';
 import Chat from '../components/Chat';
-import SignInModal from '../components/SignInModal';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Avatar, GradientAvatar } from '../components/Avatar';
+import Footer from '../components/Footer';
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -114,26 +115,15 @@ const NavLink = styled.a`
 
 const Main = styled.main`
   flex-grow: 1;
-  padding: 5rem 0 2rem; // Increased top padding to account for fixed header
-`;
-
-const Avatar = styled.div<{ size?: number }>`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--primary-dark);
-  color: white;
-  font-weight: bold;
-  border-radius: 50%;
-  width: ${({ size }) => size || 40}px;
-  height: ${({ size }) => size || 40}px;
-  font-size: ${({ size }) => (size || 40) / 2}px;
+  padding: 5rem 0 4rem; // Increased bottom padding to account for footer
 `;
 
 const AvatarButton = styled(Button)`
   padding: 0;
   border-radius: 50%;
   overflow: hidden;
+  width: 40px;
+  height: 40px;
 `;
 
 const ProfileDropdown = styled.div`
@@ -197,17 +187,14 @@ const navItems = ['Dashboard', 'Clients', 'Billing', 'Time Tracking', 'Payroll',
 
 export interface RootLayoutProps {
   children: React.ReactNode;
-  onSignInClick: () => void;
-  onSignUpClick: () => void;
+  onAuthClick: () => void;
 }
 
-const RootLayout: React.FC<RootLayoutProps> = ({ children, onSignInClick, onSignUpClick }) => {
+const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user, signOut } = useAuth();
 
   const isSignedIn = !!user;
-
-  const initials = user ? user.username.split(' ').map(n => n[0]).join('').toUpperCase() : '';
 
   const getUserEmail = (user: AuthUser | null): string => {
     if (user && typeof user === 'object' && 'attributes' in user && typeof user.attributes === 'object' && user.attributes !== null && 'email' in user.attributes) {
@@ -217,84 +204,84 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onSignInClick, onSign
   };
 
   return (
-    <html lang="en">
-      <body>
-        <GlobalStyle />
-        <LayoutWrapper>
-          <Header>
-            <Container>
-              <HeaderContent>
-                <LogoSection>
-                  <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
-                    SiteAware
-                  </SiteTitle>
-                  <PoweredBy>powered by dydact</PoweredBy>
-                </LogoSection>
-                <Nav>
-                  {navItems.map((item) => (
-                    <NavLink key={item} href={`/${item.toLowerCase().replace(' ', '-')}`}>
-                      {item}
-                    </NavLink>
-                  ))}
-                  {isSignedIn ? (
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <AvatarButton variant="ghost">
-                          <Avatar size={32}>{initials}</Avatar>
-                        </AvatarButton>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <ProfileDropdown>
-                          <ProfileHeader>
-                            <Avatar size={40}>{initials}</Avatar>
-                            <ProfileInfo>
-                              <ProfileName>{user ? user.username : 'Guest'}</ProfileName>
-                              <ProfileEmail>{getUserEmail(user)}</ProfileEmail>
-                            </ProfileInfo>
-                          </ProfileHeader>
-                          <ProfileMenu>
-                            <ProfileMenuItem>
-                              <ProfileMenuButton variant="ghost">
-                                <User size={16} className="mr-2" />
-                                Profile
-                              </ProfileMenuButton>
-                            </ProfileMenuItem>
-                            <ProfileMenuItem>
-                              <ProfileMenuButton variant="ghost">
-                                <Settings size={16} className="mr-2" />
-                                Settings
-                              </ProfileMenuButton>
-                            </ProfileMenuItem>
-                            <ProfileMenuItem>
-                              <ProfileMenuButton variant="ghost" className="text-red-400" onClick={signOut}>
-                                <LogOut size={16} className="mr-2" />
-                                Log Out
-                              </ProfileMenuButton>
-                            </ProfileMenuItem>
-                          </ProfileMenu>
-                        </ProfileDropdown>
-                      </PopoverContent>
-                    </Popover>
-                  ) : (
-                    <>
-                      <Button onClick={onSignInClick}>Sign In</Button>
-                      <Button onClick={onSignUpClick} variant="outline">Sign Up</Button>
-                    </>
+    <>
+      <GlobalStyle />
+      <LayoutWrapper>
+        <Header>
+          <Container>
+            <HeaderContent>
+              <LogoSection>
+                <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
+                  SiteAware
+                </SiteTitle>
+                <PoweredBy>powered by dydact</PoweredBy>
+              </LogoSection>
+              <Nav>
+                {navItems.map((item) => (
+                  <NavLink key={item} href={`/${item.toLowerCase().replace(' ', '-')}`}>
+                    {item}
+                  </NavLink>
+                ))}
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : onAuthClick}>
+                      {isSignedIn ? (
+                        <GradientAvatar name={user.username} email={getUserEmail(user)} size={40} />
+                      ) : (
+                        <Avatar>
+                          <User size={24} />
+                        </Avatar>
+                      )}
+                    </AvatarButton>
+                  </PopoverTrigger>
+                  {isSignedIn && (
+                    <PopoverContent>
+                      <ProfileDropdown>
+                        <ProfileHeader>
+                          <GradientAvatar name={user.username} email={getUserEmail(user)} size={40} />
+                          <ProfileInfo>
+                            <ProfileName>{user.username}</ProfileName>
+                            <ProfileEmail>{getUserEmail(user)}</ProfileEmail>
+                          </ProfileInfo>
+                        </ProfileHeader>
+                        <ProfileMenu>
+                          <ProfileMenuItem>
+                            <ProfileMenuButton variant="ghost">
+                              <User size={16} className="mr-2" />
+                              Profile
+                            </ProfileMenuButton>
+                          </ProfileMenuItem>
+                          <ProfileMenuItem>
+                            <ProfileMenuButton variant="ghost">
+                              <Settings size={16} className="mr-2" />
+                              Settings
+                            </ProfileMenuButton>
+                          </ProfileMenuItem>
+                          <ProfileMenuItem>
+                            <ProfileMenuButton variant="ghost" className="text-red-400" onClick={signOut}>
+                              <LogOut size={16} className="mr-2" />
+                              Log Out
+                            </ProfileMenuButton>
+                          </ProfileMenuItem>
+                        </ProfileMenu>
+                      </ProfileDropdown>
+                    </PopoverContent>
                   )}
-                  <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
-                    <MessageSquare className="h-5 w-5" />
-                  </Button>
-                </Nav>
-              </HeaderContent>
-            </Container>
-          </Header>
+                </Popover>
+                <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
+                  <MessageSquare className="h-5 w-5" />
+                </Button>
+              </Nav>
+            </HeaderContent>
+          </Container>
+        </Header>
 
-          <Main>{children}</Main>
+        <Main>{children}</Main>
 
-          <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-        </LayoutWrapper>
-      </body>
-    </html>
+        <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+        <Footer />
+      </LayoutWrapper>
+    </>
   );
 };
 

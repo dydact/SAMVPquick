@@ -1,6 +1,7 @@
 import RevenueChart from '../components/RevenueChart';
 import React from 'react';
 import styled from 'styled-components';
+import { Button } from '../components/ui/button';
 
 const AnalyticsContainer = styled.div`
   padding: 2rem;
@@ -9,7 +10,6 @@ const AnalyticsContainer = styled.div`
 interface AnalyticsProps {
   isSignedIn: boolean;
   handleSignOut: () => Promise<void>;
-  // Remove this line: setShowAuthPopup: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const Analytics: React.FC<AnalyticsProps> = ({ isSignedIn, handleSignOut }) => {
@@ -17,10 +17,8 @@ const Analytics: React.FC<AnalyticsProps> = ({ isSignedIn, handleSignOut }) => {
     <AnalyticsContainer>
       <h1>Analytics</h1>
       <p>View your team's performance and productivity metrics here.</p>
-      {isSignedIn ? (
-        <button onClick={handleSignOut}>Sign Out</button>
-      ) : (
-        <button onClick={() => setShowAuthPopup(true)}>Sign In</button>
+      {isSignedIn && (
+        <Button onClick={handleSignOut}>Sign Out</Button>
       )}
       <RevenueChart />
       {/* Add more analytics components here */}

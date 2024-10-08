@@ -16,6 +16,7 @@ import AuthModal from './components/AuthModal';
 import { AuthProvider } from './context/AuthContext';
 import SignUpPage from './pages/SignUpPage';
 import PlanDetails from './components/PlanDetails';
+import Footer from './components/Footer';
 
 Amplify.configure(outputs);
 const client = generateClient();
@@ -52,6 +53,11 @@ function App() {
     }
   }
 
+  const handleAuthClick = () => {
+    setAuthMode('signin');
+    setShowAuthModal(true);
+  };
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -59,10 +65,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <RootLayout 
-          onSignInClick={() => { setAuthMode('signin'); setShowAuthModal(true); }}
-          onSignUpClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}
-        >
+        <RootLayout onAuthClick={handleAuthClick}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route
@@ -119,15 +122,11 @@ function App() {
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/plans/:planId" element={<PlanDetails />} />
           </Routes>
-          {!isSignedIn && (
-            <div className="welcome-message">
-              <h2>Welcome to SiteAware</h2>
-              <p>
-                Please <button onClick={() => { setAuthMode('signin'); setShowAuthModal(true); }}>Sign In</button> to Access Features. 
-                <button onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }}>Sign Up</button> if you are not a member.
-              </p>
-            </div>
-          )}
+          <Footer 
+            isSignedIn={isSignedIn}
+            onSignIn={() => { setAuthMode('signin'); setShowAuthModal(true); }}
+            onSignUp={() => { setAuthMode('signup'); setShowAuthModal(true); }}
+          />
           {showAuthModal && (
             <AuthModal
               mode={authMode}
