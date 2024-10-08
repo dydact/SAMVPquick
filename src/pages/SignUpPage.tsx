@@ -3,13 +3,11 @@ import styled from 'styled-components';
 import { Button } from '../components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
 import { useAuth } from '../context/AuthContext';
 
 const PageContainer = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 2rem;
 `;
 
 const Hero = styled.div`
@@ -115,7 +113,7 @@ const PlanFeature = styled.li<{ featured?: boolean }>`
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth(); // Only destructure the user
+  const { user } = useAuth();
 
   const features = [
     { 
@@ -205,66 +203,59 @@ const SignUpPage: React.FC = () => {
   ];
 
   return (
-    <>
-      <PageContainer>
-        <Hero>
-          <Title>Elevate Your Enterprise with SiteAware</Title>
-          <Subtitle>Comprehensive monitoring, powerful analytics, and unmatched security for your business</Subtitle>
-        </Hero>
+    <PageContainer>
+      <Hero>
+        <Title>Elevate Your Enterprise with SiteAware</Title>
+        <Subtitle>Comprehensive monitoring, powerful analytics, and unmatched security for your business</Subtitle>
+      </Hero>
 
-        <FeaturesGrid>
-          {features.map((feature, index) => (
-            <Popover key={index}>
-              <PopoverTrigger asChild>
-                <FeatureBox onClick={() => navigate(feature.path)}>
-                  <FeatureIcon>{feature.icon}</FeatureIcon>
-                  <FeatureTitle>{feature.title}</FeatureTitle>
-                  <FeatureDescription>{feature.description}</FeatureDescription>
-                </FeatureBox>
-              </PopoverTrigger>
-              <PopoverContent>
-                <p>{feature.details}</p>
-              </PopoverContent>
-            </Popover>
-          ))}
-        </FeaturesGrid>
+      <FeaturesGrid>
+        {features.map((feature, index) => (
+          <Popover key={index}>
+            <PopoverTrigger asChild>
+              <FeatureBox onClick={() => navigate(feature.path)}>
+                <FeatureIcon>{feature.icon}</FeatureIcon>
+                <FeatureTitle>{feature.title}</FeatureTitle>
+                <FeatureDescription>{feature.description}</FeatureDescription>
+              </FeatureBox>
+            </PopoverTrigger>
+            <PopoverContent>
+              <p>{feature.details}</p>
+            </PopoverContent>
+          </Popover>
+        ))}
+      </FeaturesGrid>
 
-        <PlansContainer>
-          {plans.map((plan, index) => (
-            <Popover key={index}>
-              <PopoverTrigger asChild>
-                <PlanCard 
-                  featured={plan.title === 'SiteAware Pro'}
-                  onClick={() => navigate(plan.path)}
+      <PlansContainer>
+        {plans.map((plan, index) => (
+          <Popover key={index}>
+            <PopoverTrigger asChild>
+              <PlanCard 
+                featured={plan.title === 'SiteAware Pro'}
+                onClick={() => navigate(plan.path)}
+              >
+                <PlanTitle>{plan.title}</PlanTitle>
+                <PlanPrice>{plan.price}</PlanPrice>
+                <PlanFeatures>
+                  {plan.features.map((feature, featureIndex) => (
+                    <PlanFeature key={featureIndex} featured={plan.title === 'SiteAware Pro'}>{feature}</PlanFeature>
+                  ))}
+                </PlanFeatures>
+                <Button 
+                  variant={plan.title === 'SiteAware Pro' ? 'default' : 'outline'}
                 >
-                  <PlanTitle>{plan.title}</PlanTitle>
-                  <PlanPrice>{plan.price}</PlanPrice>
-                  <PlanFeatures>
-                    {plan.features.map((feature, featureIndex) => (
-                      <PlanFeature key={featureIndex} featured={plan.title === 'SiteAware Pro'}>{feature}</PlanFeature>
-                    ))}
-                  </PlanFeatures>
-                  <Button 
-                    variant={plan.title === 'SiteAware Pro' ? 'default' : 'outline'}
-                  >
-                    {plan.title === 'SiteAware Custom' ? 'Contact Us' : `Choose ${plan.title}`}
-                  </Button>
-                  <p>{plan.discount}</p>
-                </PlanCard>
-              </PopoverTrigger>
-              <PopoverContent>
-                <p>{plan.details}</p>
-              </PopoverContent>
-            </Popover>
-          ))}
-        </PlansContainer>
-      </PageContainer>
-      <Footer 
-        isSignedIn={!!user}
-        onSignIn={() => navigate('/signin')}
-        onSignUp={() => navigate('/signup')}
-      />
-    </>
+                  {plan.title === 'SiteAware Custom' ? 'Contact Us' : `Choose ${plan.title}`}
+                </Button>
+                <p>{plan.discount}</p>
+              </PlanCard>
+            </PopoverTrigger>
+            <PopoverContent>
+              <p>{plan.details}</p>
+            </PopoverContent>
+          </Popover>
+        ))}
+      </PlansContainer>
+    </PageContainer>
   );
 };
 

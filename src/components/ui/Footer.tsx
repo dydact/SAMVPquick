@@ -3,16 +3,11 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 const FooterContainer = styled.footer`
-  background-color: var(--background-light);
-  color: var(--text-muted);
-  padding: 0.5rem 0;
+  background-color: #2a2a2a; // Darker background
+  color: #ffffff; // White text
+  padding: 1rem 0;
   font-size: 0.9rem;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
+  margin-top: auto; // This will push the footer to the bottom
 `;
 
 const FooterContent = styled.div`
@@ -31,7 +26,7 @@ const FooterSection = styled.div`
 `;
 
 const FooterLink = styled(Link)`
-  color: var(--text-muted);
+  color: #ffffff; // White text for links
   text-decoration: none;
   &:hover {
     text-decoration: underline;
@@ -41,7 +36,7 @@ const FooterLink = styled(Link)`
 const AuthButton = styled.button`
   background: none;
   border: none;
-  color: var(--primary);
+  color: #bb86fc; // Light purple for buttons
   cursor: pointer;
   font-weight: bold;
   padding: 0;
@@ -56,12 +51,13 @@ const Copyright = styled.span`
 `;
 
 const PoweredBy = styled.span`
-  margin-left: 0.25rem; // Reduced margin
-  font-size: 0.7rem; // Reduced font size
+  font-size: 0.8rem;
+  color: #bbbbbb; // Light gray for powered by text
+  margin-left: 0.5rem;
 `;
 
 const DydactLink = styled.a`
-  color: var(--primary);
+  color: #bb86fc; // Light purple for Dydact link
   text-decoration: none;
   font-weight: bold;
   &:hover {
@@ -90,9 +86,9 @@ const Footer: React.FC<FooterProps> = ({ isSignedIn, onSignIn, onSignUp }) => {
           )}
         </FooterSection>
         <FooterSection>
-          <Copyright>© 2023-2024 SiteAware</Copyright>
+          <Copyright>&copy; 2023-2024 SiteAware</Copyright>
           <PoweredBy>
-            powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
+            Powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
           </PoweredBy>
           <FooterLink to="/about">About</FooterLink>
           <FooterLink to="/legal">Legal</FooterLink>
