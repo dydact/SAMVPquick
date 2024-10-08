@@ -1,61 +1,111 @@
 import React from 'react';
-import { Button } from "../components/ui/button"
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
-import { User, Clock, Edit, Settings, LogOut } from 'lucide-react'
-import Avatar from './Avatar';
+import styled from 'styled-components';
+import { User, Clock, Edit, Settings, LogOut } from 'lucide-react';
+import { Button } from "./ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 
-interface UserType {
-  name: string;
-  email: string;
-  role: string;
-  department: string;
-  joinDate: string;
-}
+const Avatar = styled.div<{ size?: number }>`
+  width: ${props => props.size || 40}px;
+  height: ${props => props.size || 40}px;
+  border-radius: 50%;
+  background-color: var(--primary);
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: ${props => (props.size || 40) / 2.5}px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--primary-dark);
+  }
+`;
+
+const UserInfo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+`;
+
+const UserName = styled.h3`
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+`;
+
+const UserEmail = styled.p`
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+`;
+
+const MenuButton = styled(Button)`
+  width: 100%;
+  justify-content: flex-start;
+  padding: 0.5rem 1rem;
+  color: var(--text);
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  &.logout {
+    color: var(--danger);
+    &:hover {
+      background-color: rgba(220, 53, 69, 0.1);
+    }
+  }
+`;
 
 interface UserMenuProps {
-  user: UserType;
+  user: {
+    name: string;
+    email: string;
+  };
   handleSignOut: () => void;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ user, handleSignOut }) => {
+  const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className="avatar-button">
-          <Avatar name={user.name} size={32} />
-        </Button>
+        <Avatar size={40}>{initials}</Avatar>
       </PopoverTrigger>
-      <PopoverContent className="popover">
-        <div className="popover-content">
-          <div className="user-info">
-            <Avatar name={user.name} size={60} />
+      <PopoverContent className="w-80 p-0 bg-gray-800 border-gray-700">
+        <div className="p-4">
+          <UserInfo>
+            <Avatar size={60}>{initials}</Avatar>
             <div>
-              <h3 className="user-name">{user.name}</h3>
-              <p className="user-email">{user.email}</p>
+              <UserName>{user.name}</UserName>
+              <UserEmail>{user.email}</UserEmail>
             </div>
-          </div>
-          <div className="popover-buttons">
-            <Button variant="ghost" className="popover-button">
-              <User className="icon" />
-              View Profile
-            </Button>
-            <Button variant="ghost" className="popover-button">
-              <Clock className="icon" />
-              View Timesheets
-            </Button>
-            <Button variant="ghost" className="popover-button">
-              <Edit className="icon" />
-              Modify Entered Times
-            </Button>
-            <Button variant="ghost" className="popover-button">
-              <Settings className="icon" />
-              User Settings
-            </Button>
-            <Button variant="ghost" className="popover-button logout" onClick={handleSignOut}> 
-              <LogOut className="icon" />
-              Log Out
-            </Button>
-          </div>
+          </UserInfo>
+          <MenuButton variant="ghost">
+            <User className="mr-2 h-4 w-4" />
+            View Profile
+          </MenuButton>
+          <MenuButton variant="ghost">
+            <Clock className="mr-2 h-4 w-4" />
+            View Timesheets
+          </MenuButton>
+          <MenuButton variant="ghost">
+            <Edit className="mr-2 h-4 w-4" />
+            Modify Entered Times
+          </MenuButton>
+          <MenuButton variant="ghost">
+            <Settings className="mr-2 h-4 w-4" />
+            User Settings
+          </MenuButton>
+          <MenuButton variant="ghost" className="logout" onClick={handleSignOut}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Log Out
+          </MenuButton>
         </div>
       </PopoverContent>
     </Popover>

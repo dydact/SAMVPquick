@@ -2,23 +2,22 @@
 import { useState, useEffect } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import { Amplify } from "aws-amplify";
-import { signOut, getCurrentUser } from "aws-amplify/auth";
+import { signIn, signOut, getCurrentUser, AuthUser } from "aws-amplify/auth";
 import outputs from "../amplify_outputs.json";
 import TodoList from "./components/TodoList";
-import AuthPopup from "./components/AuthPopup";
-import "./Layout.css";
-import Layout from "./app/layout"; // Import the Layout component
+import RootLayout from "./app/layout";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import Scheduling from './pages/Scheduling';
+import TaskAssignment from './components/TaskAssignment';
 
 Amplify.configure(outputs);
 
 function App() {
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAuthPopup, setShowAuthPopup] = useState(false);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   useEffect(() => {
     checkAuthState();
@@ -26,12 +25,23 @@ function App() {
 
   async function checkAuthState() {
     try {
-      await getCurrentUser();
+      const currentUser = await getCurrentUser();
       setIsSignedIn(true);
+      setUser(currentUser);
     } catch {
       setIsSignedIn(false);
+      setUser(null);
     } finally {
       setIsLoading(false);
+    }
+  }
+
+  async function handleSignIn(username: string, password: string) {
+    try {
+      await signIn({ username, password });
+      checkAuthState();
+    } catch (error) {
+      console.error("Error signing in:", error);
     }
   }
 
@@ -39,14 +49,10 @@ function App() {
     try {
       await signOut();
       setIsSignedIn(false);
+      setUser(null);
     } catch (error) {
       console.error("Error signing out:", error);
     }
-  }
-
-  function handleAuthSuccess() {
-    setIsSignedIn(true);
-    setShowAuthPopup(false);
   }
 
   if (isLoading) {
@@ -55,10 +61,11 @@ function App() {
 
   return (
     <Router>
-      <Layout
+      <RootLayout
+        user={user}
         isSignedIn={isSignedIn}
         handleSignOut={handleSignOut}
-        setShowAuthPopup={setShowAuthPopup}
+        handleSignIn={handleSignIn}
       >
         <Routes>
           <Route path="/" element={<Home />} />
@@ -88,23 +95,11 @@ function App() {
           />
           <Route 
             path="/analytics" 
-            element={
-              <Analytics 
-                isSignedIn={isSignedIn} 
-                handleSignOut={handleSignOut} 
-                setShowAuthPopup={setShowAuthPopup}
-              />
-            } 
+            element={<Analytics isSignedIn={isSignedIn} handleSignOut={handleSignOut} setShowAuthPopup={() => {}} />} 
           />
           <Route 
             path="/scheduling" 
-            element={
-              <Scheduling 
-                isSignedIn={isSignedIn} 
-                handleSignOut={handleSignOut} 
-                setShowAuthPopup={setShowAuthPopup}
-              />
-            } 
+            element={<Scheduling isSignedIn={isSignedIn} handleSignOut={handleSignOut} setShowAuthPopup={() => {}} />} 
           />
         </Routes>
         {!isSignedIn && (
@@ -113,13 +108,8 @@ function App() {
             <p>Please sign in to view and manage your todos.</p>
           </div>
         )}
-        {showAuthPopup && (
-          <AuthPopup
-            onClose={() => setShowAuthPopup(false)}
-            onAuthSuccess={handleAuthSuccess}
-          />
-        )}
-      </Layout>
+        <TaskAssignment />
+      </RootLayout>
     </Router>
   );
 }

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../app/layout';
 
 // Define the props interface for the Scheduling component
 interface SchedulingProps {
@@ -23,7 +22,7 @@ interface Schedule {
   color: string;
 }
 
-const Scheduling: React.FC<SchedulingProps> = ({ isSignedIn, handleSignOut, setShowAuthPopup }) => {
+const Scheduling: React.FC<SchedulingProps> = () => {
   const [currentWeek] = useState<Date>(new Date());
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
@@ -65,29 +64,27 @@ const Scheduling: React.FC<SchedulingProps> = ({ isSignedIn, handleSignOut, setS
   };
 
   return (
-    <Layout isSignedIn={isSignedIn} handleSignOut={handleSignOut} setShowAuthPopup={setShowAuthPopup}>
-      <div>
-        <h1>Scheduling</h1>
-        {loading && <p>Loading...</p>}
-        {error && <p>Error: {error}</p>}
-        {!loading && !error && (
-          <div>
-            <h2>Employees</h2>
-            <ul>
-              {employees.map(employee => (
-                <li key={employee.id}>{employee.name}</li>
-              ))}
-            </ul>
-            <h2>Schedules</h2>
-            <ul>
-              {schedules.map(schedule => (
-                <li key={schedule.id}>{schedule.clientName} - {schedule.date}</li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
-    </Layout>
+    <div>
+      <h1>Scheduling</h1>
+      {loading && <p>Loading...</p>}
+      {error && <p>Error: {error}</p>}
+      {!loading && !error && (
+        <div>
+          <h2>Employees</h2>
+          <ul>
+            {employees.map(employee => (
+              <li key={employee.id}>{employee.name}</li>
+            ))}
+          </ul>
+          <h2>Schedules</h2>
+          <ul>
+            {schedules.map(schedule => (
+              <li key={schedule.id}>{schedule.clientName} - {schedule.date}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
   );
 }
 
