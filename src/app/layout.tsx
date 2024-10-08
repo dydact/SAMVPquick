@@ -5,8 +5,7 @@ import styled, { createGlobalStyle } from 'styled-components';
 import { Button } from "../components/ui/button"
 import { MessageSquare, LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
-import Chat from '../components/Chat';
-import { Link, NavLink as RouterNavLink } from 'react-router-dom';
+import { Link, NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Avatar, GradientAvatar } from '../components/Avatar';
 import Footer from '../components/Footer';
@@ -205,12 +204,13 @@ export interface RootLayoutProps {
 const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
   const isSignedIn = !!user;
 
   const getUserEmail = (user: any): string => {
-    if (user && typeof user === 'object' && 'attributes' in user && typeof user.attributes === 'object' && user.attributes !== null && 'email' in user.attributes) {
-      return user.attributes.email as string;
+    if (user && user.attributes && user.attributes.email) {
+      return user.attributes.email;
     }
     return 'Not signed in';
   };
@@ -260,7 +260,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                         </ProfileHeader>
                         <ProfileMenu>
                           <ProfileMenuItem>
-                            <ProfileMenuButton variant="ghost">
+                            <ProfileMenuButton 
+                              variant="ghost" 
+                              onClick={() => navigate(user?.userType === 'client' ? '/client-profile' : '/employee-profile')}
+                            >
                               <UserIcon size={16} className="mr-2" />
                               Profile
                             </ProfileMenuButton>
@@ -285,12 +288,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                 <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
                   <MessageSquare className="h-5 w-5" />
                 </Button>
-                {isSignedIn && (
-                  <NavLink to="/profile">
-                    <UserIcon className="h-5 w-5 mr-2" />
-                    Profile
-                  </NavLink>
-                )}
               </Nav>
             </HeaderContent>
           </Container>
@@ -298,7 +295,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
 
         <Main>{children}</Main>
 
-        <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
         <Footer 
           isSignedIn={isSignedIn}
           onSignIn={onAuthClick}

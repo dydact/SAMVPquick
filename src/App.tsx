@@ -21,6 +21,12 @@ import About from './pages/About';
 import Legal from './pages/Legal';
 import Privacy from './pages/Privacy';
 import Contact from './pages/Contact';
+import ClientProfile from './pages/ClientProfile';
+import EmployeeProfile from './pages/EmployeeProfile';
+import Clients from './pages/Clients';
+import Billing from './pages/Billing';
+import TimeTracking from './pages/TimeTracking';
+import Payroll from './pages/Payroll';
 
 Amplify.configure(outputs);
 const client = generateClient();
@@ -129,6 +135,22 @@ function App() {
             <Route path="/legal" element={<Legal />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/contact" element={<Contact />} />
+            <Route
+              path="/client-profile"
+              element={
+                isSignedIn ? <ClientProfile /> : <Navigate to="/" replace />
+              }
+            />
+            <Route
+              path="/employee-profile"
+              element={
+                isSignedIn ? <EmployeeProfile /> : <Navigate to="/" replace />
+              }
+            />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/billing" element={<Billing />} />
+            <Route path="/time-tracking" element={<TimeTracking />} />
+            <Route path="/payroll" element={<Payroll />} />
           </Routes>
           <Footer 
             isSignedIn={isSignedIn}

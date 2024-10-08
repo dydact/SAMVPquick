@@ -9,8 +9,8 @@ const Chat: React.FC = () => {
   return (
     <ChatContainer>
       <h1>Chat</h1>
-      <p>Communicate with your team members in real-time.</p>
-      {/* Add more placeholder content as needed */}
+      <p>Communicate with your team and clients in real-time.</p>
+      {/* Add chat interface, message history, and user list here */}
     </ChatContainer>
   );
 };
