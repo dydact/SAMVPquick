@@ -1,102 +1,49 @@
-import { Card } from "../components/ui/card";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Clock, Users, BarChart, Calendar, PlusCircle, Search } from 'lucide-react';
+import React from 'react';
+import styled from 'styled-components';
+import { Button } from '../components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
-export default function Dashboard() {
+const DashboardContainer = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+`;
+
+const WelcomeSection = styled.div`
+  background-color: var(--primary);
+  color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+`;
+
+const Subtitle = styled.p`
+  font-size: 1.2rem;
+  margin-bottom: 1.5rem;
+`;
+
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleGetStarted = () => {
+    navigate('/signup');
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
-        <div className="flex space-x-4">
-          <Input className="flex-grow" placeholder="Search projects or tasks" />
-          <Button variant="outline">
-            <Search className="mr-2 h-4 w-4" />
-            Search
-          </Button>
-        </div>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <Card title="Total Hours Logged">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold">245.5</div>
-              <p className="text-sm text-gray-600">+2% from last week</p>
-            </div>
-            <Clock className="h-8 w-8 text-gray-400" />
-          </div>
-        </Card>
-        <Card title="Active Projects">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold">12</div>
-              <p className="text-sm text-gray-600">2 completed this month</p>
-            </div>
-            <BarChart className="h-8 w-8 text-gray-400" />
-          </div>
-        </Card>
-        <Card title="Team Members">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold">24</div>
-              <p className="text-sm text-gray-600">3 new this month</p>
-            </div>
-            <Users className="h-8 w-8 text-gray-400" />
-          </div>
-        </Card>
-        <Card title="Upcoming Deadlines">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-2xl font-bold">7</div>
-              <p className="text-sm text-gray-600">Within next 2 weeks</p>
-            </div>
-            <Calendar className="h-8 w-8 text-gray-400" />
-          </div>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card title="Recent Activity">
-          <ul className="space-y-4">
-            <li className="flex items-center">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              <span className="flex-grow">John logged 8 hours on Project A</span>
-              <span className="text-sm text-gray-600">2h ago</span>
-            </li>
-            <li className="flex items-center">
-              <div className="w-2 h-2 bg-blue-500 rounded-full mr-2"></div>
-              <span className="flex-grow">New task added to Project B</span>
-              <span className="text-sm text-gray-600">5h ago</span>
-            </li>
-            <li className="flex items-center">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full mr-2"></div>
-              <span className="flex-grow">Project C deadline updated</span>
-              <span className="text-sm text-gray-600">1d ago</span>
-            </li>
-          </ul>
-        </Card>
-        <Card title="Quick Actions">
-          <div className="space-y-4">
-            <Button className="w-full justify-start">
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Create New Project
-            </Button>
-            <Button className="w-full justify-start">
-              <Clock className="mr-2 h-4 w-4" />
-              Log Time
-            </Button>
-            <Button className="w-full justify-start">
-              <Users className="mr-2 h-4 w-4" />
-              Manage Team
-            </Button>
-            <Button className="w-full justify-start">
-              <BarChart className="mr-2 h-4 w-4" />
-              View Reports
-            </Button>
-          </div>
-        </Card>
-      </div>
-    </div>
+    <DashboardContainer>
+      <WelcomeSection>
+        <Title>Welcome to SiteAware</Title>
+        <Subtitle>Get started with our powerful site management tools</Subtitle>
+        <Button onClick={handleGetStarted}>Get Started Now</Button>
+      </WelcomeSection>
+      {/* Add more dashboard content here */}
+    </DashboardContainer>
   );
-}
+};
+
+export default Dashboard;

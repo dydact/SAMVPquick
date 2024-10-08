@@ -3,23 +3,25 @@
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Button } from "../components/ui/button"
-import { MessageSquare, ArrowLeft, LogOut, User, Settings } from 'lucide-react'
+import { MessageSquare, LogOut, User, Settings } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
 import { AuthUser } from 'aws-amplify/auth';
 import Chat from '../components/Chat';
 import SignInModal from '../components/SignInModal';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
   :root {
-    --primary: #6d28d9;
-    --primary-dark: #5b21b6;
-    --background: #111827;
-    --background-light: #1f2937;
-    --text: #ffffff;
-    --text-muted: #a0a0a0;
-    --border: #2c2c2c;
-    --accent: #4a4a4a;
+    --primary: #6200ea; // Deeper purple
+    --primary-dark: #3700b3;
+    --background: #f5f5f5; // Light gray background
+    --background-light: #ffffff;
+    --text: #333333;
+    --text-muted: #666666;
+    --border: #e0e0e0;
+    --accent: #bb86fc; // Light purple accent
   }
 
   body {
@@ -45,10 +47,12 @@ const LayoutWrapper = styled.div`
 `;
 
 const Header = styled.header`
-  background-color: var(--background-light);
+  background-color: var(--primary);
   padding: 1rem 0;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
@@ -67,16 +71,25 @@ const HeaderContent = styled.div`
 
 const LogoSection = styled.div`
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
 `;
 
-const SiteTitle = styled.h1`
+const SiteTitle = styled(Link)`
   font-size: 1.5rem;
   font-weight: 700;
   background: linear-gradient(45deg, #6d28d9, #8b5cf6);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   margin: 0;
+  text-decoration: none;
+`;
+
+const PoweredBy = styled.span`
+  font-size: 0.7rem;
+  font-weight: bold;
+  color: white;
+  margin-top: 0.2rem;
 `;
 
 const Nav = styled.nav`
@@ -86,7 +99,7 @@ const Nav = styled.nav`
 `;
 
 const NavLink = styled.a`
-  color: var(--text-muted);
+  color: var(--background-light);
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.2s ease;
@@ -94,24 +107,14 @@ const NavLink = styled.a`
   border-radius: 0.25rem;
 
   &:hover, &.active {
-    color: var(--text);
+    color: var(--accent);
     background-color: rgba(255, 255, 255, 0.1);
   }
 `;
 
 const Main = styled.main`
   flex-grow: 1;
-  padding: 2rem 0;
-`;
-
-const BackButton = styled.a`
-  color: var(--text-muted);
-  margin-right: 1rem;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: var(--text);
-  }
+  padding: 5rem 0 2rem; // Increased top padding to account for fixed header
 `;
 
 const Avatar = styled.div<{ size?: number }>`
@@ -194,27 +197,23 @@ const navItems = ['Dashboard', 'Clients', 'Billing', 'Time Tracking', 'Payroll',
 
 export interface RootLayoutProps {
   children: React.ReactNode;
-  user: AuthUser | null;
-  isSignedIn: boolean;
-  handleSignOut: () => Promise<void>;
-  handleSignIn: (username: string, password: string) => Promise<void>;
+  onSignInClick: () => void;
+  onSignUpClick: () => void;
 }
 
-const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSignedIn, handleSignOut, handleSignIn }) => {
+const RootLayout: React.FC<RootLayoutProps> = ({ children, onSignInClick, onSignUpClick }) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [showSignInModal, setShowSignInModal] = useState(false);
+  const { user, signOut } = useAuth();
 
-  const initials = authUser ? authUser.username.split(' ').map(n => n[0]).join('').toUpperCase() : '';
+  const isSignedIn = !!user;
+
+  const initials = user ? user.username.split(' ').map(n => n[0]).join('').toUpperCase() : '';
 
   const getUserEmail = (user: AuthUser | null): string => {
     if (user && typeof user === 'object' && 'attributes' in user && typeof user.attributes === 'object' && user.attributes !== null && 'email' in user.attributes) {
       return user.attributes.email as string;
     }
     return 'Not signed in';
-  };
-
-  const handleSignInClick = () => {
-    setShowSignInModal(true);
   };
 
   return (
@@ -226,10 +225,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSig
             <Container>
               <HeaderContent>
                 <LogoSection>
-                  <BackButton href="/dashboard">
-                    <ArrowLeft className="icon" />
-                  </BackButton>
-                  <SiteTitle>SiteAware</SiteTitle>
+                  <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
+                    SiteAware
+                  </SiteTitle>
+                  <PoweredBy>powered by dydact</PoweredBy>
                 </LogoSection>
                 <Nav>
                   {navItems.map((item) => (
@@ -249,8 +248,8 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSig
                           <ProfileHeader>
                             <Avatar size={40}>{initials}</Avatar>
                             <ProfileInfo>
-                              <ProfileName>{authUser ? authUser.username : 'Guest'}</ProfileName>
-                              <ProfileEmail>{getUserEmail(authUser)}</ProfileEmail>
+                              <ProfileName>{user ? user.username : 'Guest'}</ProfileName>
+                              <ProfileEmail>{getUserEmail(user)}</ProfileEmail>
                             </ProfileInfo>
                           </ProfileHeader>
                           <ProfileMenu>
@@ -267,7 +266,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSig
                               </ProfileMenuButton>
                             </ProfileMenuItem>
                             <ProfileMenuItem>
-                              <ProfileMenuButton variant="ghost" className="text-red-400" onClick={handleSignOut}>
+                              <ProfileMenuButton variant="ghost" className="text-red-400" onClick={signOut}>
                                 <LogOut size={16} className="mr-2" />
                                 Log Out
                               </ProfileMenuButton>
@@ -277,7 +276,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSig
                       </PopoverContent>
                     </Popover>
                   ) : (
-                    <Button onClick={handleSignInClick}>Sign In</Button>
+                    <>
+                      <Button onClick={onSignInClick}>Sign In</Button>
+                      <Button onClick={onSignUpClick} variant="outline">Sign Up</Button>
+                    </>
                   )}
                   <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
                     <MessageSquare className="h-5 w-5" />
@@ -290,10 +292,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, user: authUser, isSig
           <Main>{children}</Main>
 
           <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-
-          {showSignInModal && (
-            <SignInModal onClose={() => setShowSignInModal(false)} onSignIn={handleSignIn} />
-          )}
         </LayoutWrapper>
       </body>
     </html>

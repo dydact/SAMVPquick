@@ -1,91 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import styled from 'styled-components';
+import { Calendar, momentLocalizer } from 'react-big-calendar'; // Change this line
+import 'react-big-calendar/lib/css/react-big-calendar.css';
+import moment from 'moment';
 
-// Define the props interface for the Scheduling component
-interface SchedulingProps {
-  isSignedIn: boolean;
-  handleSignOut: () => Promise<void>;
-  setShowAuthPopup: (show: boolean) => void;
+const localizer = momentLocalizer(moment); // Change this line
+
+const SchedulingContainer = styled.div`
+  padding: 2rem;
+`;
+
+const CalendarContainer = styled.div`
+  height: 500px;
+  margin-top: 2rem;
+`;
+
+interface Event {
+  id: number;
+  title: string;
+  start: Date;
+  end: Date;
 }
 
-interface Employee {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  image?: string;
-}
+const Scheduling: React.FC = () => {
+  const [events, setEvents] = useState<Event[]>([]);
 
-interface Schedule {
-  id: string;
-  date: string;
-  clientName: string;
-  color: string;
-}
-
-const Scheduling: React.FC<SchedulingProps> = () => {
-  const [currentWeek] = useState<Date>(new Date());
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [schedules, setSchedules] = useState<Schedule[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    fetchEmployees();
-    fetchSchedules();
-  }, [currentWeek]);
-
-  const fetchEmployees = async () => {
-    try {
-      // Simulating API call
-      const mockEmployees: Employee[] = [
-        { id: '1', name: 'John Doe', email: 'john@example.com', phone: '1234567890' },
-        { id: '2', name: 'Jane Smith', email: 'jane@example.com', phone: '0987654321' },
-      ];
-      setEmployees(mockEmployees);
-    } catch (err) {
-      setError('Failed to fetch employees');
-    }
-  };
-
-  const fetchSchedules = async () => {
-    try {
-      setLoading(true);
-      // Simulating API call
-      const mockSchedules: Schedule[] = [
-        { id: '1', date: '2023-05-01', clientName: 'Client A', color: '#ff0000' },
-        { id: '2', date: '2023-05-02', clientName: 'Client B', color: '#00ff00' },
-      ];
-      setSchedules(mockSchedules);
-    } catch (err) {
-      setError('Failed to fetch schedules');
-    } finally {
-      setLoading(false);
+  const handleSelect = ({ start, end }: { start: Date; end: Date }) => {
+    const title = window.prompt('New Event name');
+    if (title) {
+      setEvents([
+        ...events,
+        {
+          id: events.length,
+          title,
+          start,
+          end,
+        },
+      ]);
     }
   };
 
   return (
-    <div>
+    <SchedulingContainer>
       <h1>Scheduling</h1>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
-      {!loading && !error && (
-        <div>
-          <h2>Employees</h2>
-          <ul>
-            {employees.map(employee => (
-              <li key={employee.id}>{employee.name}</li>
-            ))}
-          </ul>
-          <h2>Schedules</h2>
-          <ul>
-            {schedules.map(schedule => (
-              <li key={schedule.id}>{schedule.clientName} - {schedule.date}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+      <p>Manage your team's schedule and assignments here.</p>
+      <CalendarContainer>
+        <Calendar
+          localizer={localizer}
+          events={events}
+          startAccessor="start"
+          endAccessor="end"
+          selectable
+          onSelectSlot={handleSelect}
+        />
+      </CalendarContainer>
+    </SchedulingContainer>
   );
-}
+};
 
 export default Scheduling;

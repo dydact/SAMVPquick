@@ -1,18 +1,30 @@
 import RevenueChart from '../components/RevenueChart';
+import React from 'react';
+import styled from 'styled-components';
+
+const AnalyticsContainer = styled.div`
+  padding: 2rem;
+`;
 
 interface AnalyticsProps {
   isSignedIn: boolean;
   handleSignOut: () => Promise<void>;
-  setShowAuthPopup: (show: boolean) => void;
+  // Remove this line: setShowAuthPopup: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Analytics: React.FC<AnalyticsProps> = () => {
+const Analytics: React.FC<AnalyticsProps> = ({ isSignedIn, handleSignOut }) => {
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-bold mb-6">Analytics</h1>
+    <AnalyticsContainer>
+      <h1>Analytics</h1>
+      <p>View your team's performance and productivity metrics here.</p>
+      {isSignedIn ? (
+        <button onClick={handleSignOut}>Sign Out</button>
+      ) : (
+        <button onClick={() => setShowAuthPopup(true)}>Sign In</button>
+      )}
       <RevenueChart />
-      {/* Add other analytics components here */}
-    </div>
+      {/* Add more analytics components here */}
+    </AnalyticsContainer>
   );
 };
 
