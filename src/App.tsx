@@ -17,6 +17,10 @@ import { AuthProvider } from './context/AuthContext';
 import SignUpPage from './pages/SignUpPage';
 import PlanDetails from './components/PlanDetails';
 import Footer from './components/Footer';
+import About from './pages/About';
+import Legal from './pages/Legal';
+import Privacy from './pages/Privacy';
+import Contact from './pages/Contact';
 
 Amplify.configure(outputs);
 const client = generateClient();
@@ -121,6 +125,10 @@ function App() {
             />
             <Route path="/signup" element={<SignUpPage />} />
             <Route path="/plans/:planId" element={<PlanDetails />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/legal" element={<Legal />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/contact" element={<Contact />} />
           </Routes>
           <Footer 
             isSignedIn={isSignedIn}

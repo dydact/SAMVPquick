@@ -1,8 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { AuthUser, getCurrentUser, signOut as amplifySignOut, signIn as amplifySignIn } from 'aws-amplify/auth';
 
+interface User extends AuthUser {
+  email: string;
+  userType: 'client' | 'user';
+}
+
 interface AuthContextType {
-  user: AuthUser | null;
+  user: User | null;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -10,7 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -47,7 +52,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   const contextValue: AuthContextType = {
-    user,
+    user: user as User | null,
     signIn,
     signOut
   };

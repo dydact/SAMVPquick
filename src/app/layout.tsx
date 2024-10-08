@@ -3,11 +3,10 @@
 import React, { useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { Button } from "../components/ui/button"
-import { MessageSquare, LogOut, User, Settings } from 'lucide-react'
+import { MessageSquare, LogOut, Settings, User as UserIcon } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
-import { AuthUser } from 'aws-amplify/auth';
 import Chat from '../components/Chat';
-import { Link } from 'react-router-dom';
+import { Link, NavLink as RouterNavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Avatar, GradientAvatar } from '../components/Avatar';
 import Footer from '../components/Footer';
@@ -23,6 +22,8 @@ const GlobalStyle = createGlobalStyle`
     --text-muted: #666666;
     --border: #e0e0e0;
     --accent: #bb86fc; // Light purple accent
+    --header-bg: #1a1a1a; // Dark steel color for header
+    --siteaware-text: #e0e0e0; // Bright gray for SiteAware text
   }
 
   body {
@@ -48,14 +49,14 @@ const LayoutWrapper = styled.div`
 `;
 
 const Header = styled.header`
-  background-color: var(--primary);
+  background-color: var(--header-bg);
   padding: 1rem 0;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 `;
 
 const Container = styled.div`
@@ -79,18 +80,29 @@ const LogoSection = styled.div`
 const SiteTitle = styled(Link)`
   font-size: 1.5rem;
   font-weight: 700;
-  background: linear-gradient(45deg, #6d28d9, #8b5cf6);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--siteaware-text);
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
   margin: 0;
   text-decoration: none;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
 `;
 
 const PoweredBy = styled.span`
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: bold;
-  color: white;
-  margin-top: 0.2rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+`;
+
+const DydactLink = styled.a`
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: bold;
+  &:hover {
+    text-decoration: underline;
+  }
 `;
 
 const Nav = styled.nav`
@@ -99,7 +111,7 @@ const Nav = styled.nav`
   gap: 1rem;
 `;
 
-const NavLink = styled.a`
+const NavLink = styled(RouterNavLink)`
   color: var(--background-light);
   text-decoration: none;
   font-size: 0.9rem;
@@ -196,7 +208,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
 
   const isSignedIn = !!user;
 
-  const getUserEmail = (user: AuthUser | null): string => {
+  const getUserEmail = (user: any): string => {
     if (user && typeof user === 'object' && 'attributes' in user && typeof user.attributes === 'object' && user.attributes !== null && 'email' in user.attributes) {
       return user.attributes.email as string;
     }
@@ -214,11 +226,13 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                 <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
                   SiteAware
                 </SiteTitle>
-                <PoweredBy>powered by dydact</PoweredBy>
+                <PoweredBy>
+                  powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
+                </PoweredBy>
               </LogoSection>
               <Nav>
                 {navItems.map((item) => (
-                  <NavLink key={item} href={`/${item.toLowerCase().replace(' ', '-')}`}>
+                  <NavLink key={item} to={`/${item.toLowerCase().replace(' ', '-')}`}>
                     {item}
                   </NavLink>
                 ))}
@@ -226,10 +240,10 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                   <PopoverTrigger asChild>
                     <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : onAuthClick}>
                       {isSignedIn ? (
-                        <GradientAvatar name={user.username} email={getUserEmail(user)} size={40} />
+                        <GradientAvatar name={user?.username || ''} email={getUserEmail(user)} size={40} />
                       ) : (
                         <Avatar>
-                          <User size={24} />
+                          <UserIcon size={24} />
                         </Avatar>
                       )}
                     </AvatarButton>
@@ -238,16 +252,16 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                     <PopoverContent>
                       <ProfileDropdown>
                         <ProfileHeader>
-                          <GradientAvatar name={user.username} email={getUserEmail(user)} size={40} />
+                          <GradientAvatar name={user?.username || ''} email={getUserEmail(user)} size={40} />
                           <ProfileInfo>
-                            <ProfileName>{user.username}</ProfileName>
+                            <ProfileName>{user?.username}</ProfileName>
                             <ProfileEmail>{getUserEmail(user)}</ProfileEmail>
                           </ProfileInfo>
                         </ProfileHeader>
                         <ProfileMenu>
                           <ProfileMenuItem>
                             <ProfileMenuButton variant="ghost">
-                              <User size={16} className="mr-2" />
+                              <UserIcon size={16} className="mr-2" />
                               Profile
                             </ProfileMenuButton>
                           </ProfileMenuItem>
@@ -271,6 +285,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                 <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
                   <MessageSquare className="h-5 w-5" />
                 </Button>
+                {isSignedIn && (
+                  <NavLink to="/profile">
+                    <UserIcon className="h-5 w-5 mr-2" />
+                    Profile
+                  </NavLink>
+                )}
               </Nav>
             </HeaderContent>
           </Container>
@@ -279,7 +299,11 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
         <Main>{children}</Main>
 
         <Chat isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
-        <Footer />
+        <Footer 
+          isSignedIn={isSignedIn}
+          onSignIn={onAuthClick}
+          onSignUp={onAuthClick}
+        />
       </LayoutWrapper>
     </>
   );

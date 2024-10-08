@@ -51,6 +51,24 @@ const AuthButton = styled.button`
   }
 `;
 
+const Copyright = styled.span`
+  font-weight: bold;
+`;
+
+const PoweredBy = styled.span`
+  margin-left: 0.25rem; // Reduced margin
+  font-size: 0.7rem; // Reduced font size
+`;
+
+const DydactLink = styled.a`
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: bold;
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
 interface FooterProps {
   isSignedIn: boolean;
   onSignIn: () => void;
@@ -72,7 +90,10 @@ const Footer: React.FC<FooterProps> = ({ isSignedIn, onSignIn, onSignUp }) => {
           )}
         </FooterSection>
         <FooterSection>
-          © 2023 SiteAware
+          <Copyright>© 2023-2024 SiteAware</Copyright>
+          <PoweredBy>
+            powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
+          </PoweredBy>
           <FooterLink to="/about">About</FooterLink>
           <FooterLink to="/legal">Legal</FooterLink>
           <FooterLink to="/privacy">Privacy</FooterLink>

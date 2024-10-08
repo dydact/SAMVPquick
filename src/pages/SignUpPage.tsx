@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
+import { useAuth } from '../context/AuthContext';
 
 const PageContainer = styled.div`
   max-width: 1200px;
@@ -114,6 +115,7 @@ const PlanFeature = styled.li<{ featured?: boolean }>`
 
 const SignUpPage: React.FC = () => {
   const navigate = useNavigate();
+  const { user } = useAuth(); // Only destructure the user
 
   const features = [
     { 
@@ -257,7 +259,11 @@ const SignUpPage: React.FC = () => {
           ))}
         </PlansContainer>
       </PageContainer>
-      <Footer />
+      <Footer 
+        isSignedIn={!!user}
+        onSignIn={() => navigate('/signin')}
+        onSignUp={() => navigate('/signup')}
+      />
     </>
   );
 };
