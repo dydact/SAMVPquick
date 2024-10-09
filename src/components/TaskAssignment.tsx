@@ -3,7 +3,8 @@ import { Button, Card, List, DatePicker, Input, Select } from 'antd';
 import { generateClient } from 'aws-amplify/data';
 import { Schema } from '../../amplify/data/resource';
 import moment from 'moment';
-import { useAuth } from '../context/AuthContext'; // Import the useAuth hook
+import { useAuth } from '../context/AuthContext';
+import Calendar from './Calendar';
 
 const { Option } = Select;
 
@@ -16,7 +17,8 @@ const TaskAssignment: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [selectedDueDate, setSelectedDueDate] = useState<moment.Moment | null>(null);
   const [taskDescription, setTaskDescription] = useState('');
-  const { user } = useAuth(); // Use the useAuth hook to get the current user
+  const { user } = useAuth();
+  const [editingTask, setEditingTask] = useState<Schema['Task'] | null>(null);
 
   useEffect(() => {
     fetchTasks();
@@ -25,6 +27,10 @@ const TaskAssignment: React.FC = () => {
 
   const fetchTasks = async () => {
     try {
+      if (!client.models.Task) {
+        console.error('Task model is not available');
+        return;
+      }
       const { data } = await client.models.Task.list();
       setTasks(data);
     } catch (error) {
@@ -61,11 +67,11 @@ const TaskAssignment: React.FC = () => {
         await client.models.Task.create({
           description: taskDescription,
           status: 'PENDING',
-          treatmentPlanID: 'PLACEHOLDER_ID', // You'll need to determine how to get the correct treatment plan ID
+          treatmentPlanID: selectedUser,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         });
-        fetchTasks(); // Refresh the task list
+        fetchTasks();
         setSelectedUser(null);
         setSelectedDueDate(null);
         setTaskDescription('');
@@ -76,21 +82,44 @@ const TaskAssignment: React.FC = () => {
   };
 
   const handleEditTask = (task: Schema['Task']) => {
-    // Implement edit functionality
-    console.log('Edit task:', task);
+    setEditingTask(task);
+    setTaskDescription(task.description);
+    setSelectedUser(task.treatmentPlanID);
+    setSelectedDueDate(moment(task.createdAt));
+  };
+
+  const handleUpdateTask = async () => {
+    if (editingTask && selectedUser && selectedDueDate && taskDescription) {
+      try {
+        await client.models.Task.update({
+          id: editingTask.id,
+          description: taskDescription,
+          status: editingTask.status,
+          treatmentPlanID: selectedUser,
+          updatedAt: new Date().toISOString(),
+        });
+        fetchTasks();
+        setEditingTask(null);
+        setSelectedUser(null);
+        setSelectedDueDate(null);
+        setTaskDescription('');
+      } catch (error) {
+        console.error('Error updating task:', error);
+      }
+    }
   };
 
   const handleDeleteTask = async (taskId: string) => {
     try {
       await client.models.Task.delete({ id: taskId });
-      fetchTasks(); // Refresh the task list
+      fetchTasks();
     } catch (error) {
       console.error('Error deleting task:', error);
     }
   };
 
-  const formatDate = (date: moment.Moment | null) => {
-    return date ? date.format('YYYY-MM-DD') : '';
+  const formatDate = (date: string) => {
+    return moment(date).format('YYYY-MM-DD');
   };
 
   return (
@@ -124,11 +153,17 @@ const TaskAssignment: React.FC = () => {
             onChange={handleDueDateChange}
           />
           <br />
-          <Button type="primary" onClick={handleSubmitTask}>
-            Assign Task
+          <Button type="primary" onClick={editingTask ? handleUpdateTask : handleSubmitTask}>
+            {editingTask ? 'Update Task' : 'Assign Task'}
           </Button>
+          {editingTask && (
+            <Button onClick={() => setEditingTask(null)}>Cancel Edit</Button>
+          )}
         </div>
       )}
+
+      {/* Calendar Component */}
+      <Calendar tasks={tasks} />
 
       {/* Task List (for all users) */}
       <List
@@ -144,7 +179,7 @@ const TaskAssignment: React.FC = () => {
               ]}
             >
               <p>Assigned to: {task.treatmentPlanID}</p>
-              <p>Due: {formatDate(moment(task.createdAt))}</p>
+              <p>Due: {formatDate(task.createdAt)}</p>
               <p>Status: {task.status}</p>
             </Card>
           </List.Item>

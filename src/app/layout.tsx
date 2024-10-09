@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { Button } from "../components/ui/elements/button"
-import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown } from 'lucide-react'
+import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown, MessageCircle } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/elements/popover"
 import { Link, NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -11,6 +12,19 @@ import { Avatar, GradientAvatar } from '../components/ui/UserIcon/Avatar';
 import Footer from '../components/ui/elements/Footer';
 import AuthModal from '../components/auth/AuthModal';
 import UserMenu from '../components/UserMenu';
+import { Layout, Menu } from 'antd';
+import Notifications from '../components/Notifications';
+import { generateClient } from 'aws-amplify/api';
+import { Schema } from '../../amplify/data/resource';
+import TaskAssignment from '../components/TaskAssignment';
+import TaskRLogo from '../components/TaskRLogo';
+import TaskR from '../components/TaskR';
+import UserProfile from '../components/UserProfile';
+import Calendar from '../components/Calendar';
+
+const { Header, Content, Footer: AntFooter } = Layout;
+
+const client = generateClient<Schema>();
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -129,15 +143,17 @@ const ContentWrapper = styled.div`
   flex-grow: 1;
 `;
 
-const Header = styled.header`
+const StyledHeader = styled(Header)`
   background-color: var(--header-bg);
-  padding: 1rem 0;
+  padding: 0.5rem 0;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  height: 60px; // Reduced height
+  line-height: 60px; // Ensure vertical centering
 `;
 
 const Container = styled.div`
@@ -150,24 +166,28 @@ const HeaderContent = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  height: 100%;
 `;
 
 const LogoSection = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
+  height: 100%;
 `;
 
 const SiteTitle = styled(Link)`
-  font-size: 1.5rem;
+  font-size: 1.2rem; // Reduced font size
   font-weight: 700;
   color: var(--siteaware-text);
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
   margin: 0;
   text-decoration: none;
-  padding: 0.2rem 0.5rem;
+  padding: 0.1rem 0.3rem; // Reduced padding
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
+  line-height: 1.2; // Adjust line height
 `;
 
 const PoweredBy = styled.span`
@@ -175,6 +195,7 @@ const PoweredBy = styled.span`
   font-weight: bold;
   color: var(--text-muted);
   margin-top: 0.1rem;
+  line-height: 1; // Ensure it doesn't add extra height
 `;
 
 const DydactLink = styled.a`
@@ -189,20 +210,39 @@ const DydactLink = styled.a`
 const Nav = styled.nav`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem; // Reduced gap
+  height: 100%;
 `;
 
 const NavLink = styled(RouterNavLink)`
   color: var(--background-light);
   text-decoration: none;
-  font-size: 0.9rem;
-  transition: color 0.2s ease;
-  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  padding: 0.3rem 0.5rem;
   border-radius: 0.25rem;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 0.25rem;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  &:hover::before, &.active::before {
+    opacity: 1;
+  }
 
   &:hover, &.active {
     color: var(--accent);
-    background-color: rgba(255, 255, 255, 0.1);
   }
 `;
 
@@ -217,8 +257,8 @@ const AvatarButton = styled(Button)`
   padding: 0;
   border-radius: 50%;
   overflow: hidden;
-  width: 40px;
-  height: 40px;
+  width: 32px; // Reduced size
+  height: 32px; // Reduced size
 `;
 
 const ProfileDropdown = styled.div`
@@ -353,7 +393,126 @@ const SidebarItem = styled(Link)`
   }
 `;
 
-const navItems = ['Dashboard', 'Clients', 'Billing', 'Time Tracking', 'Payroll', 'Analytics', 'Chat', 'Scheduling'];
+// Update the TaskRText component to be more versatile
+const TaskRText = styled.span<{ $inChat?: boolean }>`
+  font-style: normal;
+  .r {
+    color: red;
+    font-weight: bold;
+    font-style: italic;
+  }
+  ${props => props.$inChat && css`
+    font-size: 0.9rem;
+  `}
+`;
+
+// Update the ChatCard component definition
+const ChatCard = styled.div<{ $isVisible: boolean }>`
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 300px;
+  height: 400px;
+  background-color: var(--background-light);
+  color: black;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  display: ${props => props.$isVisible ? 'flex' : 'none'};
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+`;
+
+// Update the ChatTabs and ChatTab components for better visibility
+const ChatTabs = styled.div`
+  display: flex;
+  background-color: var(--background);
+  border-bottom: 1px solid var(--border);
+`;
+
+const ChatTab = styled.button<{ $active: boolean }>`
+  flex: 1;
+  padding: 0.75rem 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  
+  ${props => props.$active && css`
+    background-color: var(--background-light);
+    border-bottom: 2px solid var(--primary);
+    font-weight: bold;
+  `}
+
+  &:hover {
+    background-color: ${props => props.$active ? 'var(--background-light)' : 'rgba(0, 0, 0, 0.05)'};
+  }
+`;
+
+// Update the navItems array to include the new TaskRText component
+const navItems = [
+  'Dashboard', 
+  'Clients', 
+  'Billing', 
+  'Time Tracking', 
+  'Payroll', 
+  'Analytics', 
+  'Chat', 
+  'taskR'
+];
+
+const NotificationBadge = styled.span`
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  position: absolute;
+  top: -5px;
+  right: -5px;
+`;
+
+const TaskRCapsule = styled.div<{ $isActive: boolean }>`
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: var(--header-bg);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  .task {
+    font-size: 1rem;
+  }
+
+  .r {
+    color: red;
+    font-weight: bold;
+    font-style: italic;
+    margin-left: 2px;
+  }
+
+  .icon {
+    margin-left: 5px;
+    width: 24px;
+    height: 24px;
+    background-color: var(--primary);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+`;
 
 export interface RootLayoutProps {
   children: React.ReactNode;
@@ -363,6 +522,24 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const { isSignedIn, user, signIn, signUp, signOut } = useAuth();
+  const [activeTab, setActiveTab] = useState('chat');
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [isChatVisible, setIsChatVisible] = useState(false);
+
+  useEffect(() => {
+    const fetchNotificationCount = async () => {
+      try {
+        const { data } = await client.models.Task.list({
+          filter: { status: { eq: 'PENDING' } },
+        });
+        setNotificationCount(data.length);
+      } catch (error) {
+        console.error('Error fetching notification count:', error);
+      }
+    };
+
+    fetchNotificationCount();
+  }, []);
 
   const handleAuthClick = () => {
     setAuthMode('signin');
@@ -420,7 +597,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     <>
       <GlobalStyle />
       <LayoutWrapper>
-        <Header>
+        <StyledHeader>
           <Container>
             <HeaderContent>
               <LogoSection ref={logoRef}>
@@ -432,9 +609,16 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
                 </PoweredBy>
               </LogoSection>
               <Nav>
-                {navItems.map((item) => (
-                  <NavLink key={item} to={`/${item.toLowerCase().replace(' ', '-')}`}>
-                    {item}
+                {navItems.map((item, index) => (
+                  <NavLink 
+                    key={index} 
+                    to={`/${item.toLowerCase().replace(' ', '-')}`}
+                  >
+                    {item === 'taskR' ? (
+                      <TaskRLogo />
+                    ) : (
+                      item
+                    )}
                   </NavLink>
                 ))}
                 <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : handleAuthClick}>
@@ -442,17 +626,17 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
                     <UserMenu user={user} handleSignOut={signOut} />
                   ) : (
                     <Avatar>
-                      <UserIcon size={24} />
+                      <UserIcon size={20} /> {/* Reduced icon size */}
                     </Avatar>
                   )}
                 </AvatarButton>
                 <Button variant="ghost" size="icon">
-                  <MessageSquare className="h-5 w-5" />
+                  <MessageSquare className="h-4 w-4" /> {/* Reduced icon size */}
                 </Button>
               </Nav>
             </HeaderContent>
           </Container>
-        </Header>
+        </StyledHeader>
 
         <ContentWrapper>
           <Sidebar ref={sidebarRef}>
@@ -467,7 +651,13 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
           <Main>
             <Container>
-              {children}
+              <Routes>
+                <Route path="/" element={<TaskAssignment />} />
+                <Route path="/profile" element={<UserProfile />} />
+                <Route path="/calendar" element={<Calendar />} />
+                <Route path="/taskr" element={<TaskR />} />
+                {children}
+              </Routes>
             </Container>
           </Main>
         </ContentWrapper>
@@ -490,19 +680,36 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         />
       )}
 
-      {/* Add Chat Card */}
-      <div className="chat-card">
+      {/* Updated Chat Card usage */}
+      <ChatCard $isVisible={isChatVisible}>
         <div className="chat-content">
           <div className="chat-header">
-            <h3 className="chat-title">Chat</h3>
-            <button className="chat-close">&times;</button>
+            <ChatTabs>
+              <ChatTab $active={activeTab === 'chat'} onClick={() => setActiveTab('chat')}>Chat</ChatTab>
+              <ChatTab $active={activeTab === 'notifications'} onClick={() => setActiveTab('notifications')}>Notifications</ChatTab>
+              <ChatTab $active={activeTab === 'taskr'} onClick={() => setActiveTab('taskr')}>
+                <TaskRText $inChat>task<span className="r">R</span></TaskRText>
+              </ChatTab>
+            </ChatTabs>
+            <button className="chat-close" onClick={() => setIsChatVisible(false)}>&times;</button>
           </div>
           <div className="chat-messages">
-            {/* Chat messages will go here */}
+            {activeTab === 'chat' && <p>Chat messages</p>}
+            {activeTab === 'notifications' && <Notifications />}
+            {activeTab === 'taskr' && <TaskAssignment />}
           </div>
-          <input type="text" className="chat-input" placeholder="Type a message..." />
+          {activeTab === 'chat' && (
+            <input type="text" className="chat-input" placeholder="Type a message..." />
+          )}
         </div>
-      </div>
+      </ChatCard>
+      <TaskRCapsule $isActive={isChatVisible} onClick={() => setIsChatVisible(!isChatVisible)}>
+        <span className="task">task</span>
+        <span className="r">R</span>
+        <div className="icon">
+          <MessageCircle size={16} />
+        </div>
+      </TaskRCapsule>
     </>
   );
 };

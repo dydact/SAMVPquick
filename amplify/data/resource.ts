@@ -1,12 +1,12 @@
-import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
+import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 const schema = a.schema({
   Organization: a
     .model({
       name: a.string().required(),
       type: a.string().required(), // 'PRIMARY' or 'CUSTOMER'
-      staff: a.hasMany('User'),
-      clients: a.hasMany('Client'),
+      staff: a.hasMany('User', { indexName: 'byOrganization', fields: ['id'] }),
+      clients: a.hasMany('Client', { indexName: 'byOrganization', fields: ['id'] }),
       customFields: a.string(), // For extensibility
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
@@ -19,7 +19,7 @@ const schema = a.schema({
       firstName: a.string().required(),
       lastName: a.string().required(),
       organizationID: a.string().required(),
-      organization: a.belongsTo('Organization'),
+      organization: a.belongsTo('Organization', { fields: ['organizationID'] }),
       role: a.string().required(),
       permissions: a.string(),
       status: a.string().required(), // 'ACTIVE', 'INACTIVE', 'PENDING'
@@ -44,9 +44,9 @@ const schema = a.schema({
       serviceCoordinator: a.string(),
       serviceRegion: a.string().required(),
       organizationID: a.string().required(),
-      organization: a.belongsTo('Organization'),
-      assignedStaff: a.hasMany('User'),
-      treatmentPlans: a.hasMany('TreatmentPlan'),
+      organization: a.belongsTo('Organization', { fields: ['organizationID'] }),
+      assignedStaff: a.hasMany('User', { indexName: 'byClient', fields: ['id'] }),
+      treatmentPlans: a.hasMany('TreatmentPlan', { indexName: 'byClient', fields: ['id'] }),
       clientType: a.string().required(), // 'AUTISM_WAIVER' or 'DDA'
       status: a.string().required(), // 'ACTIVE', 'INACTIVE'
       createdAt: a.datetime().required(),
@@ -57,9 +57,9 @@ const schema = a.schema({
   TreatmentPlan: a
     .model({
       clientID: a.string().required(),
-      client: a.belongsTo('Client'),
-      tasks: a.hasMany('Task'),
-      services: a.hasMany('Service'),
+      client: a.belongsTo('Client', { fields: ['clientID'] }),
+      tasks: a.hasMany('Task', { indexName: 'byTreatmentPlan', fields: ['id'] }),
+      services: a.hasMany('Service', { indexName: 'byTreatmentPlan', fields: ['id'] }),
       startDate: a.date().required(),
       endDate: a.date().required(),
       status: a.string().required(), // 'DRAFT', 'ACTIVE', 'COMPLETED'
@@ -73,7 +73,7 @@ const schema = a.schema({
       description: a.string().required(),
       treatmentPlanID: a.string().required(),
       treatmentPlan: a.belongsTo('TreatmentPlan'),
-      status: a.string().required(), // 'PENDING', 'IN_PROGRESS', 'COMPLETED'
+      status: a.string().required(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
     })
@@ -84,14 +84,14 @@ const schema = a.schema({
       name: a.string().required(),
       description: a.string(),
       treatmentPlanID: a.string().required(),
-      treatmentPlan: a.belongsTo('TreatmentPlan'),
+      treatmentPlan: a.belongsTo('TreatmentPlan', { fields: ['treatmentPlanID'] }),
       renderedBy: a.string().required(),
-      staff: a.belongsTo('User'),
+      staff: a.belongsTo('User', { fields: ['renderedBy'] }),
       startTime: a.datetime().required(),
       endTime: a.datetime().required(),
       duration: a.integer().required(), // Duration in minutes
       status: a.string().required(), // 'SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'
-      documentation: a.hasOne('Documentation'),
+      documentation: a.hasOne('Documentation', { fields: ['id'] }),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
     })
@@ -100,8 +100,8 @@ const schema = a.schema({
   Documentation: a
     .model({
       serviceID: a.string().required(),
-      service: a.belongsTo('Service'),
-      progressNotes: a.hasMany('ProgressNote'),
+      service: a.belongsTo('Service', { fields: ['serviceID'] }),
+      progressNotes: a.hasMany('ProgressNote', { indexName: 'byDocumentation', fields: ['id'] }),
       status: a.string().required(), // 'DRAFT', 'SUBMITTED', 'APPROVED'
       submittedAt: a.datetime(),
       approvedAt: a.datetime(),
@@ -113,7 +113,7 @@ const schema = a.schema({
   ProgressNote: a
     .model({
       documentationID: a.string().required(),
-      documentation: a.belongsTo('Documentation'),
+      documentation: a.belongsTo('Documentation', { fields: ['documentationID'] }),
       content: a.string().required(),
       timestamp: a.datetime().required(),
       createdBy: a.string().required(),
