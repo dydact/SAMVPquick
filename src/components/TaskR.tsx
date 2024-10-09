@@ -70,6 +70,8 @@ const TaskR: React.FC = () => {
   const fileInputRef = useRef<any>(null);
 
   const [employees, setEmployees] = useState<Schema['User'][]>([]);
+  const [sortBy, setSortBy] = useState<'priority' | 'dueDate'>('dueDate');
+  const [stakeholders, setStakeholders] = useState<Schema['User'][]>([]);
 
   const fetchEmployees = async () => {
     try {
@@ -82,7 +84,17 @@ const TaskR: React.FC = () => {
 
   useEffect(() => {
     fetchEmployees();
+    fetchStakeholders();
   }, []);
+
+  const fetchStakeholders = async () => {
+    try {
+      const { data } = await client.models.User.list();
+      setStakeholders(data);
+    } catch (error) {
+      console.error('Error fetching stakeholders:', error);
+    }
+  };
 
   const dateCellRender = (value: moment.Moment) => {
     const listData = tasks.filter(task => 
@@ -113,6 +125,20 @@ const TaskR: React.FC = () => {
     .filter(task => !selectedEmployee || task.treatmentPlanID === selectedEmployee)
     .sort((a, b) => moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf());
 
+  const sortedTasks = [...filteredTasks].sort((a, b) => {
+    if (sortBy === 'priority') {
+      const priorityOrder = { 'High': 0, 'Normal': 1, 'Low': 2 };
+      return priorityOrder[a.priority || 'Normal'] - priorityOrder[b.priority || 'Normal'];
+    } else {
+      return moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf();
+    }
+  });
+
+  const getStakeholderName = (id: string) => {
+    const stakeholder = stakeholders.find(s => s.id === id);
+    return stakeholder ? `${stakeholder.firstName} ${stakeholder.lastName}` : 'Unknown';
+  };
+
   const handleFileUpload = async (file: File) => {
     try {
       // Implement your file upload logic here
@@ -128,13 +154,13 @@ const TaskR: React.FC = () => {
 
   const renderTaskList = () => (
     <TaskList
-      dataSource={filteredTasks}
+      dataSource={sortedTasks}
       renderItem={(task) => (
         <TaskItem>
           <div>
             <h4>{task.description}</h4>
-            <p>Date: {moment(task.createdAt).format('YYYY-MM-DD')}</p>
-            <p>Stakeholder: {task.treatmentPlanID}</p>
+            <p>Due Date: {moment(task.createdAt).format('YYYY-MM-DD')}</p>
+            <p>Stakeholder: {getStakeholderName(task.treatmentPlanID)}</p>
             <p>Priority: {task.priority || 'Normal'}</p>
           </div>
           <Tag color={task.status === 'COMPLETED' ? 'green' : 'blue'}>{task.status}</Tag>
@@ -166,6 +192,14 @@ const TaskR: React.FC = () => {
       </CalendarContainer>
       <TaskListContainer>
         <h2>Tasks {selectedDate && `for ${selectedDate.format('MMMM D, YYYY')}`}</h2>
+        <Select
+          style={{ width: 200, marginBottom: 16 }}
+          value={sortBy}
+          onChange={(value) => setSortBy(value)}
+        >
+          <Option value="priority">Sort by Priority</Option>
+          <Option value="dueDate">Sort by Due Date</Option>
+        </Select>
         {user?.role === 'ADMIN' && (
           <Form
             form={form}
