@@ -1,7 +1,7 @@
 import RevenueChart from '../components/RevenueChart';
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from '../components/ui/button';
+import { Button } from '../components/ui/elements/button';
 
 const AnalyticsContainer = styled.div`
   padding: 2rem;

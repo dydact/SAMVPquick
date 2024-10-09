@@ -1,6 +1,6 @@
 //import React from 'react'
-import { Button } from "../components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
+import { Button } from "../components/ui/elements/button"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/elements/card"
 import { ArrowRight, Clock, Users, BarChart, Calendar } from 'lucide-react'
 
 export default function Home() {

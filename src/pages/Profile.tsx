@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
-import { Input } from "../components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/UserIcon/avatarImage";
+import { Button } from "../components/ui/elements/button";
+import { Card, CardContent } from "../components/ui/elements/card";
+import { Input } from "../components/ui/elements/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
 import { ArrowLeft, Edit2, Filter, PauseCircle, PlayCircle, Plus, ChevronDown, Phone, Mail, MapPin } from 'lucide-react';

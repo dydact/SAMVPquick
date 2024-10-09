@@ -1,14 +1,16 @@
 "use client"
 
 import React, { useState } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
-import { Button } from "../components/ui/button"
-import { MessageSquare, LogOut, Settings, User as UserIcon } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
+import styled, { createGlobalStyle, css } from 'styled-components';
+import { Button } from "../components/ui/elements/button"
+import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/elements/popover"
 import { Link, NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { Avatar, GradientAvatar } from '../components/Avatar';
-import Footer from '../components/Footer';
+import { useAuth } from '../hooks/useAuth';
+import { Avatar, GradientAvatar } from '../components/ui/UserIcon/Avatar';
+import Footer from '../components/ui/elements/Footer';
+import AuthModal from '../components/auth/AuthModal';
+import UserMenu from '../components/UserMenu';
 
 // Global styles
 const GlobalStyle = createGlobalStyle`
@@ -38,6 +40,81 @@ const GlobalStyle = createGlobalStyle`
     width: 1.25rem;
     height: 1.25rem;
   }
+
+  .chat-card {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    width: 300px;
+    height: 400px;
+    background-color: var(--background-light);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chat-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .chat-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .chat-close {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    &:hover {
+      color: var(--text);
+    }
+  }
+
+  .chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 1rem;
+  }
+
+  .chat-input {
+    border: none;
+    border-top: 1px solid var(--border);
+    background-color: var(--background);
+    color: var(--text);
+    padding: 0.75rem 1rem;
+    font-size: 0.9rem;
+    &::placeholder {
+      color: var(--text-muted);
+    }
+  }
+
+  @media (max-width: 768px) {
+    .header-content {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    nav {
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+  }
 `;
 
 // Styled components for layout
@@ -45,6 +122,11 @@ const LayoutWrapper = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+`;
+
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-grow: 1;
 `;
 
 const Header = styled.header`
@@ -126,7 +208,9 @@ const NavLink = styled(RouterNavLink)`
 
 const Main = styled.main`
   flex-grow: 1;
-  padding: 5rem 0 4rem; // Increased bottom padding to account for footer
+  padding: 2rem;
+  margin-left: 250px; // This should match the sidebar width
+  overflow-y: auto;
 `;
 
 const AvatarButton = styled(Button)`
@@ -194,26 +278,143 @@ const ProfileMenuButton = styled(Button)`
   }
 `;
 
+const Tabs = styled.div`
+  margin-bottom: 2rem;
+`;
+
+const TabsList = styled.div`
+  background-color: var(--background-light);
+  border-radius: 0.5rem;
+  padding: 0.25rem;
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+`;
+
+const Tab = styled.button<{ active: boolean }>`
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  ${props => props.active && css`
+    background-color: rgba(255, 255, 255, 0.1);
+    color: var(--text);
+  `}
+`;
+
+const Sidebar = styled.div`
+  background-color: var(--background-light);
+  width: 250px; // This will be adjusted dynamically
+  padding: 1rem 0;
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+  position: fixed;
+  top: 64px; // Adjust this value to match your header height
+  left: 0;
+  bottom: 0;
+  z-index: 999;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50px;
+    background: linear-gradient(to left, var(--background), transparent);
+    pointer-events: none;
+  }
+`;
+
+const SidebarContent = styled.div`
+  display: flex;
+  flex-direction: column;
+`;
+
+const SidebarItem = styled(Link)`
+  color: var(--text);
+  text-decoration: none;
+  font-size: 0.9rem;
+  padding: 0.75rem 1rem;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid var(--border);
+
+  &:hover, &.active {
+    background-color: var(--accent);
+    color: var(--background-light);
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+`;
+
 const navItems = ['Dashboard', 'Clients', 'Billing', 'Time Tracking', 'Payroll', 'Analytics', 'Chat', 'Scheduling'];
 
 export interface RootLayoutProps {
   children: React.ReactNode;
-  onAuthClick: () => void;
 }
 
-const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
+  const { isSignedIn, user, signIn, signUp, signOut } = useAuth();
 
-  const isSignedIn = !!user;
-
-  const getUserEmail = (user: any): string => {
-    if (user && user.attributes && user.attributes.email) {
-      return user.attributes.email;
-    }
-    return 'Not signed in';
+  const handleAuthClick = () => {
+    setAuthMode('signin');
+    setShowAuthModal(true);
   };
+
+  const handleAuth = async (username: string, password: string, isSignUp: boolean) => {
+    try {
+      if (isSignUp) {
+        await signUp(username, password);
+      } else {
+        await signIn(username, password);
+      }
+      setShowAuthModal(false);
+    } catch (error) {
+      console.error(`Error ${isSignUp ? 'signing up' : 'signing in'}:`, error);
+    }
+  };
+
+  const siteAwareComponents = [
+    'Video Analysis',
+    'Activity Recognition',
+    'Anomaly Detection',
+    'Patient Monitoring',
+    'Treatment Plans',
+    'Data Analytics',
+    'Alerts & Notifications',
+    'Privacy & Security'
+  ];
+
+  const logoRef = React.useRef<HTMLDivElement>(null);
+  const sidebarRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const adjustSidebarWidth = () => {
+      if (logoRef.current && sidebarRef.current) {
+        const logoWidth = logoRef.current.offsetWidth;
+        sidebarRef.current.style.width = `${logoWidth}px`;
+        const mainElement = document.querySelector('main');
+        if (mainElement) {
+          mainElement.style.marginLeft = `${logoWidth}px`;
+        }
+      }
+    };
+
+    adjustSidebarWidth();
+    window.addEventListener('resize', adjustSidebarWidth);
+
+    return () => {
+      window.removeEventListener('resize', adjustSidebarWidth);
+    };
+  }, []);
 
   return (
     <>
@@ -222,7 +423,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
         <Header>
           <Container>
             <HeaderContent>
-              <LogoSection>
+              <LogoSection ref={logoRef}>
                 <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
                   SiteAware
                 </SiteTitle>
@@ -236,56 +437,16 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
                     {item}
                   </NavLink>
                 ))}
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : onAuthClick}>
-                      {isSignedIn ? (
-                        <GradientAvatar name={user?.username || ''} email={getUserEmail(user)} size={40} />
-                      ) : (
-                        <Avatar>
-                          <UserIcon size={24} />
-                        </Avatar>
-                      )}
-                    </AvatarButton>
-                  </PopoverTrigger>
-                  {isSignedIn && (
-                    <PopoverContent>
-                      <ProfileDropdown>
-                        <ProfileHeader>
-                          <GradientAvatar name={user?.username || ''} email={getUserEmail(user)} size={40} />
-                          <ProfileInfo>
-                            <ProfileName>{user?.username}</ProfileName>
-                            <ProfileEmail>{getUserEmail(user)}</ProfileEmail>
-                          </ProfileInfo>
-                        </ProfileHeader>
-                        <ProfileMenu>
-                          <ProfileMenuItem>
-                            <ProfileMenuButton 
-                              variant="ghost" 
-                              onClick={() => navigate(user?.userType === 'client' ? '/client-profile' : '/employee-profile')}
-                            >
-                              <UserIcon size={16} className="mr-2" />
-                              Profile
-                            </ProfileMenuButton>
-                          </ProfileMenuItem>
-                          <ProfileMenuItem>
-                            <ProfileMenuButton variant="ghost">
-                              <Settings size={16} className="mr-2" />
-                              Settings
-                            </ProfileMenuButton>
-                          </ProfileMenuItem>
-                          <ProfileMenuItem>
-                            <ProfileMenuButton variant="ghost" className="text-red-400" onClick={signOut}>
-                              <LogOut size={16} className="mr-2" />
-                              Log Out
-                            </ProfileMenuButton>
-                          </ProfileMenuItem>
-                        </ProfileMenu>
-                      </ProfileDropdown>
-                    </PopoverContent>
+                <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : handleAuthClick}>
+                  {isSignedIn && user ? (
+                    <UserMenu user={user} handleSignOut={signOut} />
+                  ) : (
+                    <Avatar>
+                      <UserIcon size={24} />
+                    </Avatar>
                   )}
-                </Popover>
-                <Button variant="ghost" size="icon" onClick={() => setIsChatOpen(!isChatOpen)}>
+                </AvatarButton>
+                <Button variant="ghost" size="icon">
                   <MessageSquare className="h-5 w-5" />
                 </Button>
               </Nav>
@@ -293,14 +454,55 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children, onAuthClick }) => {
           </Container>
         </Header>
 
-        <Main>{children}</Main>
+        <ContentWrapper>
+          <Sidebar ref={sidebarRef}>
+            <SidebarContent>
+              {siteAwareComponents.map((component) => (
+                <SidebarItem key={component} to={`/${component.toLowerCase().replace(' ', '-')}`}>
+                  {component}
+                </SidebarItem>
+              ))}
+            </SidebarContent>
+          </Sidebar>
+
+          <Main>
+            <Container>
+              {children}
+            </Container>
+          </Main>
+        </ContentWrapper>
 
         <Footer 
           isSignedIn={isSignedIn}
-          onSignIn={onAuthClick}
-          onSignUp={onAuthClick}
+          onSignIn={handleAuthClick}
+          onSignUp={() => {
+            setAuthMode('signup');
+            setShowAuthModal(true);
+          }}
         />
       </LayoutWrapper>
+      {showAuthModal && (
+        <AuthModal
+          mode={authMode}
+          onClose={() => setShowAuthModal(false)}
+          onAuth={handleAuth}
+          onToggleMode={() => setAuthMode(authMode === 'signin' ? 'signup' : 'signin')}
+        />
+      )}
+
+      {/* Add Chat Card */}
+      <div className="chat-card">
+        <div className="chat-content">
+          <div className="chat-header">
+            <h3 className="chat-title">Chat</h3>
+            <button className="chat-close">&times;</button>
+          </div>
+          <div className="chat-messages">
+            {/* Chat messages will go here */}
+          </div>
+          <input type="text" className="chat-input" placeholder="Type a message..." />
+        </div>
+      </div>
     </>
   );
 };

@@ -1,0 +1,148 @@
+{
+  "hash": "99903c92",
+  "configHash": "b4d79f66",
+  "lockfileHash": "1b067713",
+  "browserHash": "ed8d0b14",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "44f04eee",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "69f68abc",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "90f6da70",
+      "needsInterop": true
+    },
+    "aws-amplify": {
+      "src": "../../node_modules/aws-amplify/dist/esm/index.mjs",
+      "file": "aws-amplify.js",
+      "fileHash": "388d80d6",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "ae81afcb",
+      "needsInterop": false
+    },
+    "aws-amplify/api": {
+      "src": "../../node_modules/aws-amplify/dist/esm/api/index.mjs",
+      "file": "aws-amplify_api.js",
+      "fileHash": "aa3d895c",
+      "needsInterop": false
+    },
+    "aws-amplify/data": {
+      "src": "../../node_modules/aws-amplify/dist/esm/api/index.mjs",
+      "file": "aws-amplify_data.js",
+      "fileHash": "8580b348",
+      "needsInterop": false
+    },
+    "antd": {
+      "src": "../../node_modules/antd/es/index.js",
+      "file": "antd.js",
+      "fileHash": "cd9c0368",
+      "needsInterop": false
+    },
+    "styled-components": {
+      "src": "../../node_modules/styled-components/dist/styled-components.browser.esm.js",
+      "file": "styled-components.js",
+      "fileHash": "c57317a2",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "f603c458",
+      "needsInterop": false
+    },
+    "aws-amplify/auth": {
+      "src": "../../node_modules/aws-amplify/dist/esm/auth/index.mjs",
+      "file": "aws-amplify_auth.js",
+      "fileHash": "d46a145e",
+      "needsInterop": false
+    },
+    "@radix-ui/react-slot": {
+      "src": "../../node_modules/@radix-ui/react-slot/dist/index.mjs",
+      "file": "@radix-ui_react-slot.js",
+      "fileHash": "e358b8c7",
+      "needsInterop": false
+    },
+    "class-variance-authority": {
+      "src": "../../node_modules/class-variance-authority/dist/index.mjs",
+      "file": "class-variance-authority.js",
+      "fileHash": "47806cbc",
+      "needsInterop": false
+    },
+    "@radix-ui/react-popover": {
+      "src": "../../node_modules/@radix-ui/react-popover/dist/index.mjs",
+      "file": "@radix-ui_react-popover.js",
+      "fileHash": "c28bca60",
+      "needsInterop": false
+    },
+    "md5": {
+      "src": "../../node_modules/md5/md5.js",
+      "file": "md5.js",
+      "fileHash": "aa0b43b4",
+      "needsInterop": true
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "bf1d76b8",
+      "needsInterop": false
+    },
+    "clsx": {
+      "src": "../../node_modules/clsx/dist/clsx.m.js",
+      "file": "clsx.js",
+      "fileHash": "d0574936",
+      "needsInterop": false
+    },
+    "tailwind-merge": {
+      "src": "../../node_modules/tailwind-merge/dist/tailwind-merge.mjs",
+      "file": "tailwind-merge.js",
+      "fileHash": "fd7e7669",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-PLMDILR6": {
+      "file": "chunk-PLMDILR6.js"
+    },
+    "chunk-HOHTUPFS": {
+      "file": "chunk-HOHTUPFS.js"
+    },
+    "chunk-WXJDAAAH": {
+      "file": "chunk-WXJDAAAH.js"
+    },
+    "chunk-JIAQSXS2": {
+      "file": "chunk-JIAQSXS2.js"
+    },
+    "chunk-UPYUGGH5": {
+      "file": "chunk-UPYUGGH5.js"
+    },
+    "chunk-O5X5HEN2": {
+      "file": "chunk-O5X5HEN2.js"
+    },
+    "chunk-LE62ILPL": {
+      "file": "chunk-LE62ILPL.js"
+    },
+    "chunk-TNTPHDQH": {
+      "file": "chunk-TNTPHDQH.js"
+    },
+    "chunk-32E4H3EV": {
+      "file": "chunk-32E4H3EV.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
+}

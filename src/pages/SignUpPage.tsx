@@ -1,9 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button } from '../components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover";
+import { Button } from '../components/ui/elements/button';
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/elements/popover";
 import { useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
+import Footer from '../components/ui/elements/Footer';
 import { useAuth } from '../context/AuthContext';
 
 const PageContainer = styled.div`

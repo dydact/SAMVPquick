@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useParams, Link } from 'react-router-dom';
-import { Button } from './ui/button';
+import { Button } from './ui/elements/button';
 
 const PlanDetailsContainer = styled.div`
   max-width: 800px;

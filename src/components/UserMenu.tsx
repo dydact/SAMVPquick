@@ -1,8 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { User, Clock, Edit, Settings, LogOut } from 'lucide-react';
-import { Button } from "./ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import { Button } from "./ui/elements/button";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/elements/popover";
 
 const Avatar = styled.div<{ size?: number }>`
   width: ${props => props.size || 40}px;
