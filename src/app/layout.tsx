@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import styled, { createGlobalStyle, css } from 'styled-components';
 import { Button } from "../components/ui/elements/button"
-import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown, MessageCircle } from 'lucide-react'
+import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown, MessageCircle, AlertCircle } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/elements/popover"
 import { Link, NavLink as RouterNavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
@@ -23,6 +23,7 @@ import UserProfile from '../components/UserProfile';
 import Calendar from '../components/Calendar';
 import Home from '../pages/Home';
 import Dashboard from '../pages/Dashboard'; // Assuming you have a Dashboard component
+import UserAvatarDropdown from '../components/UserAvatarDropdown';
 
 const { Header, Content, Footer: AntFooter } = Layout;
 
@@ -166,9 +167,41 @@ const Container = styled.div`
 
 const HeaderContent = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   height: 100%;
+`;
+
+const NavContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const NavRight = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+`;
+
+const ChatButton = styled(Button)`
+  position: relative;
+`;
+
+const NotificationDot = styled.div`
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  background-color: red;
+  border-radius: 50%;
 `;
 
 const LogoSection = styled.div`
@@ -180,16 +213,19 @@ const LogoSection = styled.div`
 `;
 
 const SiteTitle = styled(Link)`
-  font-size: 1.2rem; // Reduced font size
+  font-size: 1.2rem;
   font-weight: 700;
   color: var(--siteaware-text);
   text-shadow: 0 0 2px rgba(255, 255, 255, 0.1);
-  margin: 0;
   text-decoration: none;
-  padding: 0.1rem 0.3rem; // Reduced padding
+  padding: 0.1rem 0.3rem;
   border-radius: 4px;
   background: rgba(255, 255, 255, 0.05);
-  line-height: 1.2; // Adjust line height
+  line-height: 1.2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: 1rem;
 `;
 
 const PoweredBy = styled.span`
@@ -456,11 +492,9 @@ const ChatTab = styled.button<{ $active: boolean }>`
 const navItems = [
   'Dashboard', 
   'Clients', 
-  'Billing', 
-  'Time Tracking', 
-  'Payroll', 
+  'Finance',
   'Analytics', 
-  'Chat', 
+  'Personnel', // Added Personnel
   'taskR'
 ];
 
@@ -527,6 +561,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
   const [activeTab, setActiveTab] = useState('chat');
   const [notificationCount, setNotificationCount] = useState(0);
   const [isChatVisible, setIsChatVisible] = useState(false);
+  const [hasNotifications, setHasNotifications] = useState(false);
 
   useEffect(() => {
     const fetchNotificationCount = async () => {
@@ -602,41 +637,35 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         <StyledHeader>
           <Container>
             <HeaderContent>
-              <LogoSection ref={logoRef}>
-                <SiteTitle to="/">
-                  SiteAware
-                </SiteTitle>
-                <PoweredBy>
-                  powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
-                </PoweredBy>
-              </LogoSection>
-              <Nav>
-                <NavLink to="/">Home</NavLink>
-                {navItems.map((item, index) => (
-                  <NavLink 
-                    key={index} 
-                    to={`/${item.toLowerCase().replace(' ', '-')}`}
-                  >
-                    {item === 'taskR' ? (
-                      <TaskRLogo />
-                    ) : (
-                      item
-                    )}
-                  </NavLink>
-                ))}
-                <AvatarButton variant="ghost" onClick={isSignedIn ? undefined : handleAuthClick}>
-                  {isSignedIn && user ? (
-                    <UserMenu user={user} handleSignOut={signOut} />
-                  ) : (
-                    <Avatar>
-                      <UserIcon size={20} />
-                    </Avatar>
-                  )}
-                </AvatarButton>
-                <Button variant="ghost" size="icon">
-                  <MessageSquare className="h-4 w-4" />
-                </Button>
-              </Nav>
+              <NavContainer>
+                <NavLeft>
+                  <SiteTitle to="/">
+                    SiteAware
+                    <PoweredBy>
+                      powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
+                    </PoweredBy>
+                  </SiteTitle>
+                  {navItems.map((item, index) => (
+                    <NavLink 
+                      key={index} 
+                      to={`/${item.toLowerCase().replace(' ', '-')}`}
+                    >
+                      {item === 'taskR' ? (
+                        <TaskRLogo />
+                      ) : (
+                        item
+                      )}
+                    </NavLink>
+                  ))}
+                </NavLeft>
+                <NavRight>
+                  <ChatButton variant="ghost" size="icon" onClick={() => setIsChatVisible(!isChatVisible)}>
+                    <MessageSquare className="h-4 w-4" />
+                    {hasNotifications && <NotificationDot />}
+                  </ChatButton>
+                  <UserAvatarDropdown />
+                </NavRight>
+              </NavContainer>
             </HeaderContent>
           </Container>
         </StyledHeader>
@@ -682,7 +711,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
         <div className="chat-content">
           <div className="chat-header">
             <ChatTabs>
-              <ChatTab $active={activeTab === 'chat'} onClick={() => setActiveTab('chat')}>Chat</ChatTab>
               <ChatTab $active={activeTab === 'notifications'} onClick={() => setActiveTab('notifications')}>Notifications</ChatTab>
               <ChatTab $active={activeTab === 'taskr'} onClick={() => setActiveTab('taskr')}>
                 <TaskRText $inChat>task<span className="r">R</span></TaskRText>
@@ -691,13 +719,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
             <button className="chat-close" onClick={() => setIsChatVisible(false)}>&times;</button>
           </div>
           <div className="chat-messages">
-            {activeTab === 'chat' && <p>Chat messages</p>}
             {activeTab === 'notifications' && <Notifications />}
-            {activeTab === 'taskr' && <TaskAssignment onAssignmentComplete={() => {}} />}
+            {activeTab === 'taskr' && <TaskAssignment onAssignmentComplete={() => {
+              console.log('Task assignment completed');
+              // You might want to refresh the task list or update some state
+            }} />}
           </div>
-          {activeTab === 'chat' && (
-            <input type="text" className="chat-input" placeholder="Type a message..." />
-          )}
         </div>
       </ChatCard>
       <TaskRCapsule $isActive={isChatVisible} onClick={() => setIsChatVisible(!isChatVisible)}>

@@ -26,6 +26,7 @@ interface User extends Omit<AuthUser, 'username'> {
   subscriptionTier?: string;
   subscriptionStatus?: string;
   username: string;
+  userId: string;
 }
 
 interface AuthContextType {
@@ -76,7 +77,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setUser({
             ...authUser,
             ...userData,
-          });
+            organizationName: userData.organizationName || '',
+            organizationRole: userData.organizationRole || '',
+          } as User);
         } else {
           setUser(null);
         }
