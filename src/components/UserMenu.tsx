@@ -42,6 +42,18 @@ const UserEmail = styled.p`
   margin: 0;
 `;
 
+const UserOrg = styled.p`
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+`;
+
+const UserSubscription = styled.p`
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+`;
+
 const MenuButton = styled(Button)`
   width: 100%;
   justify-content: flex-start;
@@ -63,14 +75,18 @@ const MenuButton = styled(Button)`
 
 interface UserMenuProps {
   user: {
-    name: string;
+    firstName: string;
+    lastName: string;
     email: string;
+    organizationName: string;
+    organizationRole: string;
+    subscriptionTier?: string;
   };
   handleSignOut: () => void;
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ user, handleSignOut }) => {
-  const initials = user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+  const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
 
   return (
     <Popover>
@@ -82,8 +98,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ user, handleSignOut }) => {
           <UserInfo>
             <Avatar size={60}>{initials}</Avatar>
             <div>
-              <UserName>{user.name}</UserName>
+              <UserName>{`${user.firstName} ${user.lastName}`}</UserName>
               <UserEmail>{user.email}</UserEmail>
+              <UserOrg>{user.organizationName} - {user.organizationRole}</UserOrg>
+              {user.subscriptionTier && <UserSubscription>Tier: {user.subscriptionTier}</UserSubscription>}
             </div>
           </UserInfo>
           <MenuButton variant="ghost">

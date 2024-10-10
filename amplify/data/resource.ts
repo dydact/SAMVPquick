@@ -5,8 +5,8 @@ const schema = a.schema({
     .model({
       name: a.string().required(),
       type: a.string().required(), // 'PRIMARY' or 'CUSTOMER'
-      staff: a.hasMany('User', { indexName: 'byOrganization', fields: ['id'] }),
-      clients: a.hasMany('Client', { indexName: 'byOrganization', fields: ['id'] }),
+      staff: a.hasMany('User', { relationName: 'OrganizationStaff' }),
+      clients: a.hasMany('Client', { relationName: 'OrganizationClients' }),
       customFields: a.string(), // For extensibility
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
@@ -19,7 +19,7 @@ const schema = a.schema({
       firstName: a.string().required(),
       lastName: a.string().required(),
       organizationID: a.string().required(),
-      organization: a.belongsTo('Organization', { fields: ['organizationID'] }),
+      organization: a.belongsTo('Organization', { relationName: 'OrganizationStaff' }),
       role: a.string().required(),
       permissions: a.string(),
       status: a.string().required(), // 'ACTIVE', 'INACTIVE', 'PENDING'
@@ -44,9 +44,9 @@ const schema = a.schema({
       serviceCoordinator: a.string(),
       serviceRegion: a.string().required(),
       organizationID: a.string().required(),
-      organization: a.belongsTo('Organization', { fields: ['organizationID'] }),
-      assignedStaff: a.hasMany('User', { indexName: 'byClient', fields: ['id'] }),
-      treatmentPlans: a.hasMany('TreatmentPlan', { indexName: 'byClient', fields: ['id'] }),
+      organization: a.belongsTo('Organization', { relationName: 'OrganizationClients' }),
+      assignedStaff: a.hasMany('User', { relationName: 'ClientStaff' }),
+      treatmentPlans: a.hasMany('TreatmentPlan', { relationName: 'ClientTreatmentPlans' }),
       clientType: a.string().required(), // 'AUTISM_WAIVER' or 'DDA'
       status: a.string().required(), // 'ACTIVE', 'INACTIVE'
       createdAt: a.datetime().required(),
@@ -57,9 +57,9 @@ const schema = a.schema({
   TreatmentPlan: a
     .model({
       clientID: a.string().required(),
-      client: a.belongsTo('Client', { fields: ['clientID'] }),
-      tasks: a.hasMany('Task', { indexName: 'byTreatmentPlan', fields: ['id'] }),
-      services: a.hasMany('Service', { indexName: 'byTreatmentPlan', fields: ['id'] }),
+      client: a.belongsTo('Client', { relationName: 'ClientTreatmentPlans' }),
+      tasks: a.hasMany('Task', { relationName: 'TreatmentPlanTasks' }),
+      services: a.hasMany('Service', { relationName: 'TreatmentPlanServices' }),
       startDate: a.date().required(),
       endDate: a.date().required(),
       status: a.string().required(), // 'DRAFT', 'ACTIVE', 'COMPLETED'
@@ -72,7 +72,7 @@ const schema = a.schema({
     .model({
       description: a.string().required(),
       treatmentPlanID: a.string().required(),
-      treatmentPlan: a.belongsTo('TreatmentPlan'),
+      treatmentPlan: a.belongsTo('TreatmentPlan', { relationName: 'TreatmentPlanTasks' }),
       status: a.string().required(),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
@@ -84,14 +84,14 @@ const schema = a.schema({
       name: a.string().required(),
       description: a.string(),
       treatmentPlanID: a.string().required(),
-      treatmentPlan: a.belongsTo('TreatmentPlan', { fields: ['treatmentPlanID'] }),
+      treatmentPlan: a.belongsTo('TreatmentPlan', { relationName: 'TreatmentPlanServices' }),
       renderedBy: a.string().required(),
-      staff: a.belongsTo('User', { fields: ['renderedBy'] }),
+      staff: a.belongsTo('User', { relationName: 'UserServices' }),
       startTime: a.datetime().required(),
       endTime: a.datetime().required(),
       duration: a.integer().required(), // Duration in minutes
       status: a.string().required(), // 'SCHEDULED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED'
-      documentation: a.hasOne('Documentation', { fields: ['id'] }),
+      documentation: a.hasOne('Documentation', { relationName: 'ServiceDocumentation' }),
       createdAt: a.datetime().required(),
       updatedAt: a.datetime().required(),
     })
@@ -100,8 +100,8 @@ const schema = a.schema({
   Documentation: a
     .model({
       serviceID: a.string().required(),
-      service: a.belongsTo('Service', { fields: ['serviceID'] }),
-      progressNotes: a.hasMany('ProgressNote', { indexName: 'byDocumentation', fields: ['id'] }),
+      service: a.belongsTo('Service', { relationName: 'ServiceDocumentation' }),
+      progressNotes: a.hasMany('ProgressNote', { relationName: 'DocumentationProgressNotes' }),
       status: a.string().required(), // 'DRAFT', 'SUBMITTED', 'APPROVED'
       submittedAt: a.datetime(),
       approvedAt: a.datetime(),
@@ -113,7 +113,7 @@ const schema = a.schema({
   ProgressNote: a
     .model({
       documentationID: a.string().required(),
-      documentation: a.belongsTo('Documentation', { fields: ['documentationID'] }),
+      documentation: a.belongsTo('Documentation', { relationName: 'DocumentationProgressNotes' }),
       content: a.string().required(),
       timestamp: a.datetime().required(),
       createdBy: a.string().required(),

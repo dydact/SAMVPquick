@@ -53,36 +53,339 @@
       - Utilizing **high-level abstraction** where appropriate.
     - **Do not introduce new dependencies** unless absolutely necessary and justified.
 
-## Project-Specific Chain of Thought (CoT)
-[This section will be updated with each interaction, reflecting the current state of the project and ongoing decisions]
+---
+
+## Project Outline and Goals
+
+*Note: This section is mutable and will be updated regularly to reflect the current project outline and goals. The ongoing CoT uses the ToT to update this section, serving as a "bookmark" of our progress and providing a clear frame of reference for future iterations.*
+
+### Vision Statement
+
+**SiteAware** is on a mission to transform in-home healthcare through the power of computer vision and data analytics. We envision a future where healthcare providers can remotely monitor patients' well-being, track progress, and intervene proactively, all while ensuring patient privacy and security.
+
+### Project Architecture
+
+- **Frontend**:
+  - Framework: React
+  - Data Visualization: D3.js or other suitable libraries
+  - State Management: Redux or Context API
+  - Authentication: AWS Cognito
+  - Deployment: AWS Amplify
+
+- **Backend**:
+  - AWS Amplify (Gen 2)
+  - Storage: AWS S3
+  - Video Processing: AWS Rekognition Video, AWS Kinesis Video Streams
+  - Data Analytics: AWS Kinesis Data Analytics, AWS Athena
+  - Real-time Communication: AWS AppSync
+
+### Key Features
+
+- **Real-time Video Analysis**: Continuous monitoring and analysis of video streams to detect critical events.
+- **Activity Recognition**: Identification and tracking of patient activities to assess their well-being.
+- **Anomaly Detection**: Proactive identification of unusual patterns or behaviors that may indicate a need for intervention.
+- **Secure Data Storage**: HIPAA-compliant data storage and encryption to ensure patient privacy.
+- **Scalable and Cost-Effective**: Serverless architecture allows for flexible scaling and cost optimization.
 
 ### Current Status
-- Implementing task assignment component into the taskR route page
-- Modifying the calendar component for improved usability and data representation
+
+- **Implemented Components and Features**:
+  1. **TaskR Component** with calendar integration.
+  2. **User Authentication and Authorization** using AWS Cognito.
+  3. **Basic Task Management Functionality**.
+  4. **Employee Sidebar** for task filtering.
+  5. **File Upload Capability** (UI only, backend implementation pending).
+
+### Remaining Tasks
+
+1. **Implement Payroll/Billing/Time Tracking**:
+   - Create new components for Payroll, Billing, and Time Tracking.
+   - Integrate these components into the TaskR view.
+   - Update the data model to include necessary fields for these features.
+   - Implement backend logic for calculating payroll and billing.
+
+2. **Update Sidebar Navigation**:
+   - Move Video Analysis, Activity Recognition, Anomaly Detection, Patient Monitoring, and Treatment Plans to the Clients section.
+   - Create a new Analytics section with Video Analysis, Activity Recognition, Data Analytics, and Alerts & Notifications.
+   - Update the Privacy and Security settings to be visible in the user profile page.
+
+3. **Refine TaskR Component**:
+   - Implement priority-based sorting for tasks.
+   - Add stakeholder information to task display.
+   - Improve the calendar view to show more detailed task information.
+
+4. **Implement File Upload Functionality**:
+   - Set up AWS S3 for file uploads.
+   - Implement backend logic for file upload and association with tasks.
+   - Add file management capabilities (view, download, delete).
+
+5. **Enhance User Roles and Permissions**:
+   - Implement more granular access control based on user roles.
+   - Ensure employees can only see their own schedule and relevant stakeholder information.
+
+6. **Optimize Performance**:
+   - Implement lazy loading for components.
+   - Optimize state management with `useMemo` and `useCallback`.
+
+7. **Testing and Documentation**:
+   - Write unit tests for all components.
+   - Perform integration testing.
+   - Update user documentation with new features and workflows.
+
+8. **Deployment and Monitoring**:
+   - Set up staging environment.
+   - Implement error logging and monitoring.
+   - Plan for production deployment.
+
+---
+
+## Project-Specific Chain of Thought (CoT)
+
+### Current Status
+
+**Specialized Agents and Their Tasks:**
+
+- **Frontend Developer (Alice):**
+  - Integrated `ChatInterface` component into the main application layout.
+  - Implemented styling for `ChatBubble` and `ChatInterface` components.
+  - Began refining the `TaskR` component with priority-based sorting.
+
+- **Backend Developer (Bob):**
+  - Connected `ChatInterface` with backend API for real-time messaging.
+  - Reviewed Amplify Gen 2 schema instructions and identified discrepancies.
+  - Updated the data model in `src/amplify/data/resource.ts` to align with Gen 2 schema.
+
+- **Data Engineer (Carlos):**
+  - Started setting up AWS S3 for file uploads.
+  - Configured AWS Kinesis for real-time data streaming.
+  - Began implementation of data analytics pipelines using AWS Athena.
+
+- **DevOps Engineer (Dana):**
+  - Configured the staging environment.
+  - Implemented error logging using CloudWatch.
+  - Set up monitoring dashboards for system metrics.
 
 ### Recent Decisions
-1. Calendar modification:
-   - Increase width for better visibility
-   - Monthly and yearly views to show color-coded horizontal bars for different services
-   - Bars to represent billing, payment, and remittance information per service
+
+1. **Schema Alignment with Amplify Gen 2**:
+   - **Backend Developer** will update the schema in `src/amplify/data/resource.ts` to comply with Amplify Gen 2 instructions.
+   - This ensures that data models are properly defined and generated.
+
+2. **Modularization of Components**:
+   - **Frontend Developer** will refactor components into reusable modules.
+   - Improves code maintainability and reusability across the application.
+
+3. **Implementation of Specialized Roles**:
+   - Assigning tasks to agents based on expertise to enhance efficiency and quality.
+   - Each agent updates their progress in their respective sections in the CoT and ToT.
 
 ### Next Steps
-1. Address the import error in TaskAssignment.tsx
-2. Implement task assignment component in taskR route page
-3. Modify calendar component
-4. Update related components and data structures
+
+1. **Frontend Developer (Alice)**:
+   - Complete refinement of the `TaskR` component.
+   - Implement stakeholder information display in tasks.
+   - Begin working on the updated sidebar navigation.
+
+2. **Backend Developer (Bob)**:
+   - Finalize updates to the data models.
+   - Implement backend logic for payroll, billing, and time tracking.
+   - Ensure data integrity and compliance with HIPAA regulations.
+
+3. **Data Engineer (Carlos)**:
+   - Complete AWS S3 setup for file uploads.
+   - Implement backend logic for file association with tasks.
+   - Start on activity recognition algorithms using AWS Rekognition.
+
+4. **DevOps Engineer (Dana)**:
+   - Continue refining the staging environment.
+   - Implement continuous integration and deployment (CI/CD) pipelines.
+   - Set up alerting mechanisms for system anomalies.
+
+5. **Quality Assurance Engineer (Eve)**:
+   - Begin writing unit tests for new components.
+   - Plan and start integration testing.
+   - Review documentation for accuracy and completeness.
+
+---
 
 ## Trail of Thought (ToT)
-[This section will be updated with each interaction, documenting the reasoning behind decisions and changes]
 
-1. Identified import error in TaskAssignment.tsx
-2. Created api.ts file to handle API functions
-3. Updated types.ts file to include Task and User interfaces
-4. Next: Integrate TaskAssignment component into taskR route page
+1. **Frontend Developer (Alice)**:
+   - Integrated `ChatInterface` into the main layout without disrupting existing components.
+   - Styled `ChatBubble` and `ChatInterface` for a cohesive UI.
+   - Decided to use `useMemo` and `useCallback` in `TaskR` to optimize performance.
+
+2. **Backend Developer (Bob)**:
+   - Updated `src/amplify/data/resource.ts` to match Amplify Gen 2 schema instructions.
+   - Regenerated API clients after schema changes.
+   - Tested new endpoints to ensure they return expected data.
+
+3. **Data Engineer (Carlos)**:
+   - Configured AWS S3 buckets with proper security policies.
+   - Implemented presigned URLs for secure file uploads.
+   - Investigated AWS Rekognition capabilities for activity recognition.
+
+4. **DevOps Engineer (Dana)**:
+   - Set up a staging environment identical to production for accurate testing.
+   - Configured CloudWatch to collect logs from all services.
+   - Created dashboards displaying key metrics like CPU usage, memory, and network traffic.
+
+5. **Quality Assurance Engineer (Eve)**:
+   - Drafted unit tests for `ChatInterface` and `TaskR` components.
+   - Identified some edge cases that need to be handled in the frontend code.
+   - Updated user documentation to include the new chat functionality.
+
+---
 
 ## Reflection and Self-Improvement
-[This section will be used to document insights on how to improve the CoT and ToT process]
 
-- Consider creating a separate file for core instructions to prevent accidental modifications
-- Implement a version control system for the CoT and ToT to track changes over time
-- Develop a method to cross-reference decisions with specific code changes
+- **Enhancing Collaboration**:
+  - The introduction of specialized agents has improved task management and project clarity.
+  - Each agent is now responsible for updating their sections, promoting accountability.
+
+- **Improving CoT Granularity**:
+  - Tasks are broken down into smaller subtasks, making progress tracking more efficient.
+  - Detailed documentation in the ToT aids in knowledge transfer and onboarding.
+
+- **Process Optimization**:
+  - Recognized the need for regular meetings between agents to synchronize efforts.
+  - Plan to implement a shared task board (e.g., Jira or Trello) for better visibility.
+
+- **Future Actions**:
+  - Set up automated tools for code linting and formatting to maintain code quality.
+  - Explore more advanced CI/CD tools to streamline deployment processes.
+  - Consider adopting pair programming sessions to improve code quality and team cohesion.
+
+---
+
+## Additional Long-Term Goals
+
+1. **"White-Box" SaaS Architecture**:
+   - Separate GUI elements from functional components.
+   - Create a modular, easily customizable SaaS framework.
+   - Develop with the potential for resale or rapid deployment for other uses.
+
+2. **t.ask.R! Spin-Off Application**:
+   - Plan for future development of t.ask.R! as a standalone product.
+   - Ensure current development facilitates easy extraction of t.ask.R! functionality.
+
+### Current Focus: Auth Integration and Basic Feature Implementation
+
+1. **Implement AWS Amplify Gen 2 Authentication**:
+   - Set up sign-up/sign-in flow connected to the Amplify app.
+   - Include company/organization registration in the auth flow.
+   - Prepare for future subscription tier support.
+
+2. **Develop Sleek Vertical Dropdown Menu**:
+   - Create a user menu that adapts based on user access level.
+   - Implement sign-in/sign-up auth window for non-authenticated users.
+
+3. **Rudimentary Feature Access**:
+   - Implement basic features for users to try immediately after authentication.
+
+### Next Steps
+
+1. **Auth Integration (Frontend Developer - Alice)**:
+   - Modify sign-up form to include organization-related fields.
+   - Implement vertical dropdown menu for user options.
+   - Create sign-in/sign-up modal for non-authenticated users.
+
+2. **Auth Integration (Backend Developer - Bob)**:
+   - Update Amplify auth configuration with new attributes and triggers.
+   - Implement post-confirmation Lambda function for user record creation.
+   - Modify User model in the schema to include organization and subscription info.
+
+3. **Feature Implementation (Full Team)**:
+   - Identify and implement 2-3 core features for immediate user testing.
+   - Ensure features are access-controlled based on authentication status.
+
+4. **Code Refactoring (Ongoing)**:
+   - Begin separating GUI elements from functional components.
+   - Document the separation process for future "white-box" development.
+
+---
+
+## Current Issue: Resolving Linter Errors and Rendering Problems
+
+### Summary
+
+We have addressed linter errors in our Amplify data schema and resolved type issues in our AuthContext. These changes aim to improve code quality and resolve rendering issues.
+
+### Actions Taken
+
+1. **Updated amplify/data/resource.ts**:
+   - Removed `indexName` and `fields` options from relationship definitions.
+   - Simplified `authorization` arrays to use correct types.
+
+2. **Updated src/context/AuthContext.tsx**:
+   - Modified the `User` interface to extend `Omit<AuthUser, 'username'>`.
+   - Added missing properties to the dev mode user object.
+   - Ensured type consistency in `setUser` calls.
+
+### Next Steps
+
+1. **Frontend Developer (Alice)**:
+   - Review and test the updated AuthContext to ensure it works as expected.
+   - Update any components that rely on the User type to accommodate the changes.
+
+2. **Backend Developer (Bob)**:
+   - Verify that the updated Amplify schema doesn't break any existing queries or mutations.
+   - Run a test deployment to ensure the backend accepts the new schema without issues.
+
+3. **Quality Assurance Engineer (Eve)**:
+   - Conduct thorough testing of the authentication flow, especially in dev mode.
+   - Verify that all user-related features still function correctly with the updated User type.
+
+4. **DevOps Engineer (Dana)**:
+   - Monitor the next deployment for any issues related to the schema changes.
+   - Update any CI/CD scripts if necessary to accommodate the new schema structure.
+
+### Trail of Thought (ToT)
+
+1. **Schema Simplification**:
+   - Removed complex options from relationship definitions to resolve type errors.
+   - This change might affect query performance, so we need to monitor and optimize if necessary.
+
+2. **AuthContext Improvements**:
+   - Enhanced type safety by extending from AuthUser and adding missing properties.
+   - Dev mode now provides a more complete user object, improving consistency between dev and production environments.
+
+3. **Potential Impacts**:
+   - Components relying on specific user properties may need updates.
+   - Backend queries might require adjustment if they were using removed index names.
+
+4. **Future Considerations**:
+   - We may need to implement custom resolvers or additional backend logic to maintain the functionality previously provided by index names and fields in relationships.
+   - Consider implementing a more robust dev mode that mimics production data structures more closely.
+
+---
+
+## Next Steps
+
+- **Frontend Developer (Alice)**:
+
+  - **Commit** changes to the repository with detailed commit messages.
+  - **Merge** changes after code review.
+
+- **DevOps Engineer (Dana)**:
+
+  - **Monitor** the deployment for any new issues.
+  - **Document** changes made to AWS Amplify settings.
+
+- **Quality Assurance Engineer (Eve)**:
+
+  - **Perform** regression testing on staging and production environments.
+  - **Update** test cases to cover the rendering issues and their resolutions.
+
+- **Team Collaboration**:
+
+  - **Schedule** a meeting to review the changes and ensure everyone is informed.
+  - **Plan** for any additional training or knowledge sharing if necessary.
+
+---
+
+## Developer Notes
+
+### public/index.html
+
+```

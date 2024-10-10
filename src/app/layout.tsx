@@ -21,6 +21,8 @@ import TaskRLogo from '../components/TaskRLogo';
 import TaskR from '../components/TaskR';
 import UserProfile from '../components/UserProfile';
 import Calendar from '../components/Calendar';
+import Home from '../pages/Home';
+import Dashboard from '../pages/Dashboard'; // Assuming you have a Dashboard component
 
 const { Header, Content, Footer: AntFooter } = Layout;
 
@@ -601,7 +603,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
           <Container>
             <HeaderContent>
               <LogoSection ref={logoRef}>
-                <SiteTitle to={isSignedIn ? "/dashboard" : "/signup"}>
+                <SiteTitle to="/">
                   SiteAware
                 </SiteTitle>
                 <PoweredBy>
@@ -609,6 +611,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
                 </PoweredBy>
               </LogoSection>
               <Nav>
+                <NavLink to="/">Home</NavLink>
                 {navItems.map((item, index) => (
                   <NavLink 
                     key={index} 
@@ -626,12 +629,12 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
                     <UserMenu user={user} handleSignOut={signOut} />
                   ) : (
                     <Avatar>
-                      <UserIcon size={20} /> {/* Reduced icon size */}
+                      <UserIcon size={20} />
                     </Avatar>
                   )}
                 </AvatarButton>
                 <Button variant="ghost" size="icon">
-                  <MessageSquare className="h-4 w-4" /> {/* Reduced icon size */}
+                  <MessageSquare className="h-4 w-4" />
                 </Button>
               </Nav>
             </HeaderContent>
@@ -651,13 +654,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
 
           <Main>
             <Container>
-              <Routes>
-                <Route path="/" element={<TaskAssignment />} />
-                <Route path="/profile" element={<UserProfile />} />
-                <Route path="/calendar" element={<Calendar />} />
-                <Route path="/taskr" element={<TaskR />} />
-                {children}
-              </Routes>
+              {children}
             </Container>
           </Main>
         </ContentWrapper>
@@ -696,7 +693,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
           <div className="chat-messages">
             {activeTab === 'chat' && <p>Chat messages</p>}
             {activeTab === 'notifications' && <Notifications />}
-            {activeTab === 'taskr' && <TaskAssignment />}
+            {activeTab === 'taskr' && <TaskAssignment onAssignmentComplete={() => {}} />}
           </div>
           {activeTab === 'chat' && (
             <input type="text" className="chat-input" placeholder="Type a message..." />

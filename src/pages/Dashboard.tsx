@@ -1,17 +1,11 @@
 import React from 'react';
-import styled from 'styled-components';
-
-const DashboardContainer = styled.div`
-  padding: 2rem;
-`;
 
 const Dashboard: React.FC = () => {
   return (
-    <DashboardContainer>
+    <div>
       <h1>Dashboard</h1>
-      <p>Welcome to your SiteAware dashboard. Here you'll find an overview of your site's performance and key metrics.</p>
-      {/* Add dashboard widgets and components here */}
-    </DashboardContainer>
+      <p>Welcome to your dashboard!</p>
+    </div>
   );
 };
 

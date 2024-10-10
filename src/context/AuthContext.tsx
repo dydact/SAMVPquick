@@ -17,9 +17,15 @@ declare global {
 
 const DEV_MODE = window.__DEV_MODE__ === true;
 
-interface User extends AuthUser {
+interface User extends Omit<AuthUser, 'username'> {
   email: string;
-  role: string;
+  firstName: string;
+  lastName: string;
+  organizationName: string;
+  organizationRole: string;
+  subscriptionTier?: string;
+  subscriptionStatus?: string;
+  username: string;
 }
 
 interface AuthContextType {
@@ -45,7 +51,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function checkUser() {
     if (isDevMode) {
-      setUser({ email: 'dev@example.com', role: 'ADMIN', userId: 'dev-user-id' } as User);
+      setUser({
+        email: 'dev@example.com',
+        firstName: 'Dev',
+        lastName: 'User',
+        organizationName: 'Dev Org',
+        organizationRole: 'ADMIN',
+        subscriptionTier: 'pro',
+        subscriptionStatus: 'active',
+        userId: 'dev-user-id',
+        username: 'dev-user'
+      } as User);
       setIsLoading(false);
       return;
     }
@@ -59,8 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (userData) {
           setUser({
             ...authUser,
-            email: userData.email,
-            role: userData.role,
+            ...userData,
           });
         } else {
           setUser(null);
@@ -77,7 +92,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   async function signInUser(username: string, password: string) {
     if (isDevMode) {
-      setUser({ email: username, role: 'ADMIN', userId: 'dev-user-id' } as User);
+      setUser({
+        email: username,
+        firstName: 'Dev',
+        lastName: 'User',
+        organizationName: 'Dev Org',
+        organizationRole: 'ADMIN',
+        userId: 'dev-user-id',
+        username: username
+      } as User);
       return;
     }
 

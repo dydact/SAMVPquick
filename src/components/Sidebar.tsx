@@ -4,10 +4,14 @@ import styled from 'styled-components';
 import { Home, Calendar, MessageSquare, Clipboard } from 'lucide-react';
 
 const SidebarContainer = styled.nav`
-  width: 250px;
-  background-color: var(--background-dark);
-  color: var(--text);
-  padding: 2rem 1rem;
+  width: 250px; // Adjust as needed
+  background-color: #f0f0f0;
+  padding-top: 60px; // Match the Header height
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  overflow-y: auto;
 `;
 
 const Logo = styled.h1`

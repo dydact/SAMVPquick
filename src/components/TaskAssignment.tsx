@@ -4,9 +4,10 @@ import { fetchTasks, fetchUsers, assignTask } from '../api';
 
 interface TaskAssignmentProps {
   onAssignmentComplete: () => void;
+  inChatBubble?: boolean;
 }
 
-const TaskAssignment: React.FC<TaskAssignmentProps> = ({ onAssignmentComplete }) => {
+const TaskAssignment: React.FC<TaskAssignmentProps> = ({ onAssignmentComplete, inChatBubble = false }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [selectedTask, setSelectedTask] = useState<string>('');
@@ -30,11 +31,12 @@ const TaskAssignment: React.FC<TaskAssignmentProps> = ({ onAssignmentComplete })
   };
 
   return (
-    <div className="task-assignment">
+    <div className={`task-assignment ${inChatBubble ? 'chat-bubble' : ''}`}>
       <h2>Assign Task</h2>
       <select
         value={selectedTask}
         onChange={(e) => setSelectedTask(e.target.value)}
+        className="task-select"
       >
         <option value="">Select a task</option>
         {tasks.map((task) => (
@@ -46,6 +48,7 @@ const TaskAssignment: React.FC<TaskAssignmentProps> = ({ onAssignmentComplete })
       <select
         value={selectedUser}
         onChange={(e) => setSelectedUser(e.target.value)}
+        className="user-select"
       >
         <option value="">Select a user</option>
         {users.map((user) => (
@@ -54,7 +57,7 @@ const TaskAssignment: React.FC<TaskAssignmentProps> = ({ onAssignmentComplete })
           </option>
         ))}
       </select>
-      <button onClick={handleAssign}>Assign Task</button>
+      <button onClick={handleAssign} className="assign-button">Assign Task</button>
     </div>
   );
 };

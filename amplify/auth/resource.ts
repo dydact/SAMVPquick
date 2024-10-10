@@ -11,7 +11,7 @@ export const auth = defineAuth({
     phone: false,
     username: false
   },
-  signUpAttributes: ['email', 'firstName', 'lastName'],
+  signUpAttributes: ['email', 'firstName', 'lastName', 'organizationName', 'organizationRole'],
   passwordPolicy: {
     minLength: 8,
     requireLowercase: true,
@@ -22,7 +22,12 @@ export const auth = defineAuth({
   mfa: {
     enabled: false
   },
-  verificationMechanisms: ['email']
+  verificationMechanisms: ['email'],
+  lambdaTriggers: {
+    postConfirmation: {
+      handler: 'src/lambdas/postConfirmation.handler'
+    }
+  }
 });
 
 // Define the Message model
