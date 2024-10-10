@@ -95,6 +95,7 @@
   3. **Basic Task Management Functionality**.
   4. **Employee Sidebar** for task filtering.
   5. **File Upload Capability** (UI only, backend implementation pending).
+  6. **SignIn and SignUp pages**.
 
 ### Remaining Tasks
 
@@ -398,204 +399,96 @@ We have addressed linter errors in our Amplify data schema and resolved type iss
 - Implemented ProfilePage component.
 - Updated App.tsx to make Home the default loaded page.
 - Enhanced Dashboard with placeholder content and hooks for future integration.
+- Implemented SignIn and SignUp pages.
 
 ## Next Steps
 
-1. Integrate Dashboard hooks with actual data:
+1. Implement access control for non-authenticated users:
+   - Hide and gray out non-accessible components (Clients, Personnel, Analytics, t.ask.R!, chat bubble).
+   - Add hover/click effect prompting signin/signup with tooltip message.
+
+2. Enhance UI/UX:
+   - Implement translucent design with subtle animations.
+   - Update chat bubble tabbed items to black bold font with capsule design for selection.
+   - Redesign t.ask.R! component with color-coded urgency/priority system.
+
+3. Integrate Dashboard hooks with actual data:
    - Connect task count to TaskAssignment component.
    - Fetch active projects from the backend.
    - Calculate total hours from time tracking data.
    - Implement a system for logging and fetching recent activities.
 
-2. Enhance PersonnelTab with real data:
+4. Enhance PersonnelTab with real data:
    - Fetch user list from the backend.
    - Implement pagination for large user lists.
    - Add search and filter functionality.
 
-3. Develop detailed views for each card on the Dashboard:
-   - Create a TaskList component for viewing all tasks.
-   - Implement a ProjectOverview component for active projects.
-   - Design a TimeTracking component for detailed hour logs.
-   - Create an ActivityFeed component for a full list of recent activities.
+5. Implement multi-step authentication flow:
+   - Create pop-up auth for user avatar icon clicks.
+   - Implement multi-step flow for new organizational clients.
 
-4. Implement data fetching from t.ask.R! for Time Tracking and Payroll calculations:
+6. Implement data fetching from t.ask.R! for Time Tracking and Payroll calculations:
    - Create API endpoints for t.ask.R! data.
    - Implement hooks for fetching and caching t.ask.R! data.
    - Update FinanceManagement component to use real data.
 
-5. Enhance the Video Analysis tab in the Analytics page:
+7. Enhance the Video Analysis tab in the Analytics page:
    - Integrate with AWS Kinesis Video Streams.
    - Implement real-time video processing.
    - Develop UI for displaying video analysis results.
 
-## Immediate Actions
+## Long-term Goals
 
-1. Refine Dashboard layout and styling:
-   - Ensure responsive design for various screen sizes.
-   - Implement loading states for data fetching.
-   - Add error handling for failed data fetches.
+1. Develop dydact CrBrS:
+   - Custom dydact LLM hosted on private hardware or SiteAware deployment.
+   - Train LLM to interact with client data and generate real-time RAG and interactive results.
+   - Implement conversational AI with high-level voice interaction and customizations.
+   - Explore as a potential spin-off SaaS product.
 
-2. Begin implementation of detailed view components:
-   - Start with TaskList component as it relates to existing TaskAssignment functionality.
+2. Implement on-site interactive RAG system.
 
-3. Set up backend API endpoints for Dashboard data:
-   - Create endpoints for task count, active projects, total hours, and recent activity.
-   - Implement proper error handling and data validation.
+3. Develop t.ask.R! as a standalone product.
 
-4. Update FinanceManagement component to prepare for t.ask.R! integration:
-   - Create placeholder functions for data fetching.
-   - Design UI components for displaying time tracking and payroll data.
-
-## Reflection and Self-Improvement
-
-- The addition of placeholder hooks in the Dashboard provides a clear path for future data integration.
-- Consider implementing a state management solution (e.g., Redux) as the application grows in complexity.
-- Regularly review and refactor components to ensure maintainability and reusability.
-
-## Current Challenges
-
-1. Ensuring consistent data flow between components as we integrate real data.
-2. Maintaining performance with increased data fetching and processing.
-3. Balancing between immediate functionality and long-term scalability in our design decisions.
-
-## Long-term Considerations
-
-1. Implement caching strategies to reduce API calls and improve performance.
-2. Develop a comprehensive testing strategy, including unit tests and integration tests.
-3. Consider implementing real-time updates using WebSockets for live data on the Dashboard.
-4. Plan for internationalization to support multiple languages in the future.
-5. Explore options for data visualization libraries to enhance the presentation of analytics and financial data.
-
----
-
-## Additional Long-Term Goals
-
-1. **"White-Box" SaaS Architecture**:
+4. Create a "White-Box" SaaS Architecture:
    - Separate GUI elements from functional components.
    - Create a modular, easily customizable SaaS framework.
    - Develop with the potential for resale or rapid deployment for other uses.
 
-2. **t.ask.R! Spin-Off Application**:
-   - Plan for future development of t.ask.R! as a standalone product.
-   - Ensure current development facilitates easy extraction of t.ask.R! functionality.
+## Immediate Actions
 
-### Current Focus: Auth Integration and Basic Feature Implementation
+1. Update access control in RootLayout:
+   - Implement conditional rendering for non-authenticated users.
+   - Create styled components for grayed-out nav items with hover effects.
 
-1. **Implement AWS Amplify Gen 2 Authentication**:
-   - Set up sign-up/sign-in flow connected to the Amplify app.
-   - Include company/organization registration in the auth flow.
-   - Prepare for future subscription tier support.
+2. Enhance UI/UX:
+   - Update global styles with more translucent design.
+   - Implement subtle animations for user interactions.
+   - Redesign chat bubble and t.ask.R! components.
 
-2. **Develop Sleek Vertical Dropdown Menu**:
-   - Create a user menu that adapts based on user access level.
-   - Implement sign-in/sign-up auth window for non-authenticated users.
+3. Begin implementation of multi-step authentication flow:
+   - Create AuthModal component for pop-up authentication.
+   - Update UserAvatarDropdown to trigger AuthModal for non-authenticated users.
 
-3. **Rudimentary Feature Access**:
-   - Implement basic features for users to try immediately after authentication.
+4. Start implementing t.ask.R! color-coded urgency/priority system:
+   - Create new styled components for t.ask.R! with color variations.
+   - Implement logic for determining task urgency/priority.
 
-### Next Steps
+## Reflection and Self-Improvement
 
-1. **Auth Integration (Frontend Developer - Alice)**:
-   - Modify sign-up form to include organization-related fields.
-   - Implement vertical dropdown menu for user options.
-   - Create sign-in/sign-up modal for non-authenticated users.
+- The addition of access control and enhanced UI/UX will significantly improve user experience.
+- Implementing a multi-step authentication flow will cater to both existing users and potential new clients.
+- Regular review and refactoring of components will be crucial as we add new features and integrations.
 
-2. **Auth Integration (Backend Developer - Bob)**:
-   - Update Amplify auth configuration with new attributes and triggers.
-   - Implement post-confirmation Lambda function for user record creation.
-   - Modify User model in the schema to include organization and subscription info.
+## Current Challenges
 
-3. **Feature Implementation (Full Team)**:
-   - Identify and implement 2-3 core features for immediate user testing.
-   - Ensure features are access-controlled based on authentication status.
+1. Balancing security (access control) with user experience for non-authenticated users.
+2. Ensuring smooth integration of real data with placeholder components.
+3. Maintaining consistent design language across new and existing components.
+4. Implementing a flexible authentication system that works for both individual users and organizations.
 
-4. **Code Refactoring (Ongoing)**:
-   - Begin separating GUI elements from functional components.
-   - Document the separation process for future "white-box" development.
+## Long-term Considerations
 
----
-
-## Current Issue: Resolving Linter Errors and Rendering Problems
-
-### Summary
-
-We have addressed linter errors in our Amplify data schema and resolved type issues in our AuthContext. These changes aim to improve code quality and resolve rendering issues.
-
-### Actions Taken
-
-1. **Updated amplify/data/resource.ts**:
-   - Removed `indexName` and `fields` options from relationship definitions.
-   - Simplified `authorization` arrays to use correct types.
-
-2. **Updated src/context/AuthContext.tsx**:
-   - Modified the `User` interface to extend `Omit<AuthUser, 'username'>`.
-   - Added missing properties to the dev mode user object.
-   - Ensured type consistency in `setUser` calls.
-
-### Next Steps
-
-1. **Frontend Developer (Alice)**:
-   - Review and test the updated AuthContext to ensure it works as expected.
-   - Update any components that rely on the User type to accommodate the changes.
-
-2. **Backend Developer (Bob)**:
-   - Verify that the updated Amplify schema doesn't break any existing queries or mutations.
-   - Run a test deployment to ensure the backend accepts the new schema without issues.
-
-3. **Quality Assurance Engineer (Eve)**:
-   - Conduct thorough testing of the authentication flow, especially in dev mode.
-   - Verify that all user-related features still function correctly with the updated User type.
-
-4. **DevOps Engineer (Dana)**:
-   - Monitor the next deployment for any issues related to the schema changes.
-   - Update any CI/CD scripts if necessary to accommodate the new schema structure.
-
-### Trail of Thought (ToT)
-
-1. **Schema Simplification**:
-   - Removed complex options from relationship definitions to resolve type errors.
-   - This change might affect query performance, so we need to monitor and optimize if necessary.
-
-2. **AuthContext Improvements**:
-   - Enhanced type safety by extending from AuthUser and adding missing properties.
-   - Dev mode now provides a more complete user object, improving consistency between dev and production environments.
-
-3. **Potential Impacts**:
-   - Components relying on specific user properties may need updates.
-   - Backend queries might require adjustment if they were using removed index names.
-
-4. **Future Considerations**:
-   - We may need to implement custom resolvers or additional backend logic to maintain the functionality previously provided by index names and fields in relationships.
-   - Consider implementing a more robust dev mode that mimics production data structures more closely.
-
----
-
-## Next Steps
-
-- **Frontend Developer (Alice)**:
-
-  - **Commit** changes to the repository with detailed commit messages.
-  - **Merge** changes after code review.
-
-- **DevOps Engineer (Dana)**:
-
-  - **Monitor** the deployment for any new issues.
-  - **Document** changes made to AWS Amplify settings.
-
-- **Quality Assurance Engineer (Eve)**:
-
-  - **Perform** regression testing on staging and production environments.
-  - **Update** test cases to cover the rendering issues and their resolutions.
-
-- **Team Collaboration**:
-
-  - **Schedule** a meeting to review the changes and ensure everyone is informed.
-  - **Plan** for any additional training or knowledge sharing if necessary.
-
----
-
-## Developer Notes
-
-### public/index.html
-
-```
+1. Plan for scalability of dydact CrBrS system, considering computational requirements and data privacy.
+2. Develop a comprehensive testing strategy for AI-generated components and applications.
+3. Consider implementing a plugin system for easy integration of custom modules in the "White-Box" SaaS architecture.
+4. Explore options for secure, private deployment of AI models for clients with sensitive data.

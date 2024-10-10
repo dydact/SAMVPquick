@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { fetchAuthSession, signIn, signOut, getCurrentUser, AuthUser } from 'aws-amplify/auth';
 import { generateClient } from 'aws-amplify/api';
 import { Schema } from '../../amplify/data/resource';
+import { signUp, confirmSignUp } from 'aws-amplify/auth';
+import { Auth } from 'aws-amplify';
 
 const client = generateClient<Schema>();
 
@@ -31,12 +33,11 @@ interface User extends Omit<AuthUser, 'username'> {
 
 interface AuthContextType {
   user: User | null;
-  signIn: (username: string, password: string) => Promise<void>;
+  signIn: (username: string, password: string) => Promise<{ isSignedIn: boolean; nextStep?: any }>;
+  signUp: (username: string, password: string, email: string, name: string) => Promise<{ isSignUpComplete: boolean; userId?: string; nextStep?: any }>;
   signOut: () => Promise<void>;
   isLoading: boolean;
   isSignedIn: boolean;
-  toggleDevMode: () => void;
-  isDevMode: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -94,34 +95,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }
 
   async function signInUser(username: string, password: string) {
-    if (isDevMode) {
-      setUser({
-        email: username,
-        firstName: 'Dev',
-        lastName: 'User',
-        organizationName: 'Dev Org',
-        organizationRole: 'ADMIN',
-        userId: 'dev-user-id',
-        username: username
-      } as User);
-      return;
-    }
-
     try {
-      await signIn({ username, password });
+      const { isSignedIn, nextStep } = await signIn({ username, password });
+    
+      if (!isSignedIn) {
+        console.log('Additional steps required', nextStep);
+        return { isSignedIn, nextStep };
+      }
+
       await checkUser();
+      return { isSignedIn };
     } catch (error) {
       console.error('Error signing in:', error);
-      throw error;
+      throw error; // Re-throw the error so it can be caught in the AuthModal
     }
   }
 
   async function signOutUser() {
-    if (isDevMode) {
-      setUser(null);
-      return;
-    }
-
     try {
       await signOut();
       setUser(null);
@@ -131,10 +121,64 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }
 
+  async function signUpUser(username: string, password: string, email: string, name: string) {
+    try {
+      const { isSignUpComplete, userId, nextStep } = await signUp({
+        username,
+        password,
+        options: {
+          userAttributes: {
+            email,
+            name,
+          },
+        },
+      });
+
+      if (!isSignUpComplete) {
+        // Handle confirmation step if required
+        console.log('Confirmation may be required');
+        return { userId, nextStep };
+      }
+
+      return { isSignUpComplete };
+    } catch (error) {
+      console.error('Error signing up:', error);
+      throw error;
+    }
+  }
+
   function toggleDevMode() {
     setIsDevMode(prev => !prev);
     checkUser();
   }
+
+  const cognitoSignUp = async (username: string, password: string, email: string) => {
+    try {
+      const { user } = await Auth.signUp({
+        username,
+        password,
+        attributes: {
+          email,
+        },
+      });
+      console.log('Cognito sign up successful', user);
+      // Update state or perform additional actions as needed
+    } catch (error) {
+      console.error('Error signing up with Cognito:', error);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+
+  const cognitoSignIn = async (username: string, password: string) => {
+    try {
+      const user = await Auth.signIn(username, password);
+      console.log('Cognito sign in successful', user);
+      // Update state or perform additional actions as needed
+    } catch (error) {
+      console.error('Error signing in with Cognito:', error);
+      // Handle error (e.g., show error message to user)
+    }
+  };
 
   const contextValue: AuthContextType = {
     user,
@@ -144,6 +188,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isSignedIn: !!user,
     toggleDevMode,
     isDevMode,
+    signUp: signUpUser,
+    cognitoSignUp,
+    cognitoSignIn,
   };
 
   return (

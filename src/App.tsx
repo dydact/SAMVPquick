@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import RootLayout from './app/layout';
 import ErrorBoundary from './components/ErrorBoundary';
-import { createGlobalStyle } from 'styled-components';
+import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard'; // Assuming you have a Dashboard component
 import Analytics from './pages/Analytics';
@@ -17,7 +17,9 @@ import EmployeeManagement from './pages/EmployeeManagement';
 import AdminDashboard from './pages/AdminDashboard';
 import ProfilePage from './pages/ProfilePage';
 import Personnel from './pages/Personnel';
-
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
+import { createGlobalStyle } from 'styled-components';
 const GlobalStyle = createGlobalStyle`
   body {
     margin: 0;
@@ -42,9 +44,11 @@ const App: React.FC = () => {
             <RootLayout>
               <Routes>
                 <Route path="/" element={<Home />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/analytics" element={<Analytics isSignedIn={false} handleSignOut={async () => {}} />} />
-                <Route path="/finance" element={<FinanceManagement isSignedIn={false} handleSignOut={async () => {}} />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                <Route path="/finance" element={<ProtectedRoute><FinanceManagement /></ProtectedRoute>} />
                 <Route path="/task-assignment" element={<TaskAssignment onAssignmentComplete={() => {}} />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/calendar" element={<Calendar tasks={[]} onTaskUpdate={() => {
