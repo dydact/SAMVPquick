@@ -1,18 +1,23 @@
 import React from 'react';
-import styled from 'styled-components';
+import TaskForm from '../components/TaskForm';
+import TaskAssignment from '../components/TaskAssignment';
 
-const TaskAssignmentContainer = styled.div`
-  padding: 2rem;
-`;
+const TaskAssignmentPage: React.FC = () => {
+  const handleTaskCreated = () => {
+    // Refresh task list or perform other actions after task creation
+  };
 
-const TaskAssignment: React.FC = () => {
+  const handleAssignmentComplete = () => {
+    // Refresh task list or perform other actions after assignment
+  };
+
   return (
-    <TaskAssignmentContainer>
-      <h1>Task Assignment</h1>
-      <p>Assign and manage tasks for your team members.</p>
-      {/* Add more placeholder content as needed */}
-    </TaskAssignmentContainer>
+    <div className="task-assignment-page">
+      <h1>Task Management</h1>
+      <TaskForm onTaskCreated={handleTaskCreated} />
+      <TaskAssignment onAssignmentComplete={handleAssignmentComplete} />
+    </div>
   );
 };
 
-export default TaskAssignment;
+export default TaskAssignmentPage;
