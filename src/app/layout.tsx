@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import styled, { createGlobalStyle, css, keyframes } from 'styled-components';
+import styled, { createGlobalStyle, css } from 'styled-components';
 import { Button } from "../components/ui/elements/button"
 import { MessageSquare, LogOut, Settings, User as UserIcon, ChevronDown, MessageCircle, AlertCircle } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/elements/popover"
@@ -29,11 +29,6 @@ const { Header, Content, Footer: AntFooter } = Layout;
 
 const client = generateClient<Schema>();
 
-const fadeIn = keyframes`
-  from { opacity: 0; }
-  to { opacity: 1; }
-`;
-
 // Global styles
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -56,8 +51,6 @@ const GlobalStyle = createGlobalStyle`
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
   }
 
   .icon {
@@ -138,10 +131,6 @@ const GlobalStyle = createGlobalStyle`
       margin-top: 1rem;
       flex-wrap: wrap;
     }
-  }
-
-  .animate-fade-in {
-    animation: ${fadeIn} 0.3s ease-in;
   }
 `;
 
@@ -462,7 +451,7 @@ const ChatCard = styled.div<{ $isVisible: boolean }>`
   right: 20px;
   width: 300px;
   height: 400px;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--background-light);
   color: black;
   border-radius: 0.5rem;
   overflow: hidden;
@@ -470,9 +459,6 @@ const ChatCard = styled.div<{ $isVisible: boolean }>`
   flex-direction: column;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
-  backdrop-filter: blur(5px);
-  transform: ${props => props.$isVisible ? 'translateY(0)' : 'translateY(20px)'};
-  opacity: ${props => props.$isVisible ? 1 : 0};
 `;
 
 // Update the ChatTabs and ChatTab components for better visibility
@@ -535,24 +521,21 @@ const TaskRCapsule = styled.div<{ $isActive: boolean }>`
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transform: ${props => props.$isActive ? 'scale(1.05)' : 'scale(1)'};
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 
   &:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
   }
 
   .task {
     font-size: 1rem;
-    font-weight: bold;
   }
 
   .r {
-    color: ${props => props.$isActive ? 'var(--accent)' : 'red'};
+    color: red;
     font-weight: bold;
     font-style: italic;
     margin-left: 2px;
-    transition: color 0.3s ease;
   }
 
   .icon {
@@ -565,17 +548,6 @@ const TaskRCapsule = styled.div<{ $isActive: boolean }>`
     justify-content: center;
     align-items: center;
   }
-`;
-
-const GrayedOutNavLink = styled(NavLink)`
-  color: var(--text-muted);
-  pointer-events: none;
-  opacity: 0.5;
-`;
-
-const TooltipWrapper = styled.div`
-  position: relative;
-  display: inline-block;
 `;
 
 export interface RootLayoutProps {
@@ -658,21 +630,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
     };
   }, []);
 
-  const renderNavLink = (item: string, index: number) => {
-    const LinkComponent = isSignedIn ? NavLink : GrayedOutNavLink;
-    const content = item === 'taskR' ? <TaskRLogo /> : item;
-
-    return isSignedIn ? (
-      <LinkComponent key={index} to={`/${item.toLowerCase().replace(' ', '-')}`}>
-        {content}
-      </LinkComponent>
-    ) : (
-      <TooltipWrapper key={index} title="Please sign in to access this feature">
-        <LinkComponent to="#">{content}</LinkComponent>
-      </TooltipWrapper>
-    );
-  };
-
   return (
     <>
       <GlobalStyle />
@@ -688,7 +645,18 @@ const RootLayout: React.FC<RootLayoutProps> = ({ children }) => {
                       powered by <DydactLink href="https://dydact.io" target="_blank" rel="noopener noreferrer">dydact LLMs</DydactLink>
                     </PoweredBy>
                   </SiteTitle>
-                  {navItems.map((item, index) => renderNavLink(item, index))}
+                  {navItems.map((item, index) => (
+                    <NavLink 
+                      key={index} 
+                      to={`/${item.toLowerCase().replace(' ', '-')}`}
+                    >
+                      {item === 'taskR' ? (
+                        <TaskRLogo />
+                      ) : (
+                        item
+                      )}
+                    </NavLink>
+                  ))}
                 </NavLeft>
                 <NavRight>
                   <ChatButton variant="ghost" size="icon" onClick={() => setIsChatVisible(!isChatVisible)}>

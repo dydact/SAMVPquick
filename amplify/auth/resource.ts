@@ -1,22 +1,33 @@
 import { defineAuth } from '@aws-amplify/backend';
+import { a } from '@aws-amplify/backend';
 
 /**
  * Define and configure your auth resource
  * @see https://docs.amplify.aws/gen2/build-a-backend/auth
  */
 export const auth = defineAuth({
-  loginMechanisms: ['email'],
-  signUpAttributes: ['name', 'email'],
+  loginWith: {
+    email: true,
+    phone: false,
+    username: false
+  },
+  signUpAttributes: ['email', 'firstName', 'lastName', 'organizationName', 'organizationRole'],
   passwordPolicy: {
     minLength: 8,
-    requireNumbers: true,
-    requireSpecialCharacters: true,
     requireLowercase: true,
     requireUppercase: true,
+    requireNumbers: true,
+    requireSpecialCharacters: true
   },
   mfa: {
-    enabled: false,
+    enabled: false
   },
+  verificationMechanisms: ['email'],
+  lambdaTriggers: {
+    postConfirmation: {
+      handler: 'src/lambdas/postConfirmation.handler'
+    }
+  }
 });
 
 // Define the Message model

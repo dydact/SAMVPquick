@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import { User as UserIcon, Settings, LogOut } from 'lucide-react';
 import { Button } from './ui/elements/button';
 import { useAuth } from '../context/AuthContext';
-import AuthModal from './AuthModal';
 
 const DropdownContainer = styled.div`
   position: relative;
@@ -35,41 +34,30 @@ const DropdownItem = styled(Link)`
 
 const UserAvatarDropdown: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const { user, signOut, isSignedIn } = useAuth();
+  const { user, signOut } = useAuth();
 
   return (
     <DropdownContainer
       onMouseEnter={() => setIsOpen(true)}
       onMouseLeave={() => setIsOpen(false)}
     >
-      <Button variant="ghost" size="icon" onClick={() => setShowAuthModal(true)}>
+      <Button variant="ghost" size="icon">
         <UserIcon size={20} />
       </Button>
       <DropdownMenu isOpen={isOpen}>
-        {isSignedIn ? (
-          <>
-            <DropdownItem to="/profile">
-              <UserIcon size={16} style={{ marginRight: '0.5rem' }} />
-              Profile
-            </DropdownItem>
-            <DropdownItem to="/settings">
-              <Settings size={16} style={{ marginRight: '0.5rem' }} />
-              Settings
-            </DropdownItem>
-            <DropdownItem as="button" onClick={signOut}>
-              <LogOut size={16} style={{ marginRight: '0.5rem' }} />
-              Sign Out
-            </DropdownItem>
-          </>
-        ) : (
-          <DropdownItem to="/signin">
-            <UserIcon size={16} style={{ marginRight: '0.5rem' }} />
-            Sign In
-          </DropdownItem>
-        )}
+        <DropdownItem to="/profile">
+          <UserIcon size={16} style={{ marginRight: '0.5rem' }} />
+          Profile
+        </DropdownItem>
+        <DropdownItem to="/settings">
+          <Settings size={16} style={{ marginRight: '0.5rem' }} />
+          Settings
+        </DropdownItem>
+        <DropdownItem to="/" onClick={signOut}>
+          <LogOut size={16} style={{ marginRight: '0.5rem' }} />
+          Sign Out
+        </DropdownItem>
       </DropdownMenu>
-      {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
     </DropdownContainer>
   );
 };
